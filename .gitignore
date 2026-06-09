@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+venv/
+env/
+
+# Django
+*.log
+debug.log
+local.sqlite3
+db.sqlite3
+media/
+staticfiles/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+ticketProject/db.sqlite3
+ticketProject/debug.log
+
+# Unwanted project files
+free-claude-code/
+main.py
+memory/
+node_modules/
+package-lock.json
+package.json
+*.zip
