@@ -44,4 +44,6 @@ memory/
 node_modules/
 package-lock.json
 package.json
+FUTURE_PLANS.md
+آموزش-پروژه.md
 *.zip
