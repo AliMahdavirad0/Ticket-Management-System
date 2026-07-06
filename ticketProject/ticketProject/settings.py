@@ -28,6 +28,7 @@ ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',') if os.envi
     '127.0.0.1',
     '[::1]',
     'testserver',
+    'backend',
 ]
 
 # CORS — allow Vite dev server on 5173 and production domain
