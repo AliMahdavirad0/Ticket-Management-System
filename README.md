@@ -87,6 +87,10 @@ docker compose version
 
 - This removes containers, images, and volumes before rebuilding the project.
 
+---
+---
+---
+
 ### Backend
 
 ```bash
