@@ -383,5 +383,3 @@ python manage.py test accounts.tests tickets.tests dashboard.tests
 ```
 
 ---
-
-THIS IS A TEST FOR CI
