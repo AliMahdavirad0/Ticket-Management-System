@@ -12,6 +12,81 @@ Full-stack role-based ticket management system with JWT authentication.
 
 ## Quick Start
 
+## Docker Setup
+
+This project is fully Dockerized. The frontend (React + Vite) and backend (Django) can be built and run using Docker Compose.
+Prerequisites
+
+- Before running the project, make sure the following software is installed:
+
+     - Docker Desktop
+
+     - Docker Compose (included with Docker Desktop)
+
+#### Verify the installation:
+
+```bash
+docker --version
+docker compose version
+```
+
+#### From the project root directory, execute:
+
+    `docker compose up --build`
+
+
+#### Docker Compose will automatically:
+
+    Build the Django backend image
+
+    Build the React frontend image
+
+    Install all dependencies
+
+    Run Django database migrations
+
+    Start the backend server
+
+    Start the frontend development server
+
+
+#### Access the Application
+
+- Frontend : http://localhost:5173
+
+- Backend API : http://localhost:8000
+
+- Swagger API Documentation : http://localhost:8000/api/docs/
+
+- Admin Panel : http://localhost:8000/admin/
+
+#### Stopping the Project
+
+- To stop all running containers:
+    `docker compose down`
+
+#### Rebuilding the Project
+
+- If source files or Dockerfiles are modified:
+    `docker compose up --build`
+
+#### Creating a Django Superuser (Optional)
+
+- If access to the Django admin panel is needed:
+    `docker compose exec backend python manage.py createsuperuser`
+
+- Follow the prompts to create the administrator account.
+
+#### Rebuilding from Scratch
+
+- If a clean build is required:
+    ```bash
+    docker compose down --volumes --rmi all
+    docker compose up --build
+    ```
+
+- This removes containers, images, and volumes before rebuilding the project.
+
 ### Backend
 
 ```bash
