@@ -1,0 +1,35 @@
+@startuml SystemContext
+!include <C4/C4_Context>
+!include <C4/C4_Container>
+
+LAYOUT_WITH_LEGEND()
+
+title System Context Diagram - Ticket Management System
+
+Person(customer, "Customer", "Creates & manages own support tickets")
+Person(agent, "Support Agent", "Handles assigned & unassigned tickets")
+Person(admin, "Administrator", "Full system & user management")
+Person(superuser, "Django Superuser", "Direct Django Admin access")
+
+System_Boundary(tms, "Ticket Management System") {
+    System(tms_system, "Ticket Management System", "Ticket CRUD, assignment workflows,\nmessaging & role-based dashboards")
+}
+
+System_Ext(email, "Email Notification Service", "(Not Implemented)\nSends transactional emails:\npassword resets, assignment alerts,\nstatus change notifications")
+System_Ext(pg, "PostgreSQL Database", "(Planned)\nPersists all application data:\nusers, tickets, messages & categories")
+System_Ext(s3, "Object Storage", "(Not Implemented)\nStores & serves uploaded files:\nticket attachments & profile images")
+
+Rel(customer, tms_system, "Registers, creates tickets, messages, views dashboard", "REST | JSON/HTTPS")
+Rel(agent, tms_system, "Manages tickets, changes status/priority, converses", "REST | JSON/HTTPS")
+Rel(admin, tms_system, "Manages users/roles/categories, assigns agents", "REST | JSON/HTTPS")
+Rel(superuser, tms_system, "Manages system via Django Admin", "HTTPS | HTML")
+
+Rel(tms_system, email, "Sends notifications on ticket events (future)", "")
+Rel(tms_system, pg, "Planned database migration target", "SQL | TCP/5432")
+Rel(tms_system, s3, "Future file attachment storage", "S3 API | HTTPS")
+
+' ── New return/outbound edges (standard implementation logic) ──
+Rel(email, tms_system, "Delivery status webhook callbacks (future)", "HTTP | JSON")
+Rel(s3, tms_system, "Serves stored file content on request (future)", "HTTPS")
+
+@enduml

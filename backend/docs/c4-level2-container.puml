@@ -1,0 +1,112 @@
+@startuml ContainerDiagram
+!include <C4/C4_Container>
+!include <C4/C4_Context>
+
+LAYOUT_WITH_LEGEND()
+
+title Container Diagram - Ticket Management System
+
+' ============================================================
+'  PERSONAS  (identical to Level 1)
+' ============================================================
+Person(customer, "Customer", "Creates & manages own support tickets")
+Person(agent, "Support Agent", "Handles assigned & unassigned tickets")
+Person(admin, "Administrator", "Full system & user management")
+Person(superuser, "Django Superuser", "Direct Django Admin access")
+
+' ============================================================
+'  EXTERNAL SYSTEMS  (identical to Level 1)
+' ============================================================
+System_Ext(email, "Email Notification Service", "(Not Implemented)\nSends transactional emails:\npassword resets, assignment alerts,\nstatus change notifications")
+System_Ext(pg_ext, "PostgreSQL Database", "(Planned)\nPersists all application data:\nusers, tickets, messages & categories")
+System_Ext(s3, "Object Storage", "(Not Implemented)\nStores & serves uploaded files:\nticket attachments & profile images")
+
+' ============================================================
+'  SYSTEM BOUNDARY  — Ticket Management System
+' ============================================================
+System_Boundary(tms, "Ticket Management System") {
+
+  ' ── Container C1: Single Page Application ────────────────
+  Container(spa, "Single Page Application", "React 18, TypeScript, Vite 5\nTailwind CSS 3, React Router 6\nTanStack React Query 5, Axios", "Role-based web UI:\nticket CRUD, messaging,\ndashboard & user management")
+
+  ' ── Container C2: Django REST API ────────────────────────
+  Container(api, "Django REST API Server", "Django 6, DRF 3.17\ndjango-filter, drf-spectacular 0.29\ndjango-cors-headers 4.7", "RESTful API with layered\nservice architecture:\nView → Service → Model → DB")
+
+  ' ── Container C3: Django Admin Interface ────────────────
+  Container(admin_panel, "Django Admin Interface", "Django 6 Admin Templates", "Built-in admin panel at /admin/\nfor direct model CRUD")
+
+  ' ── Container C4: Relational Database ───────────────────
+  ContainerDb(db, "Relational Database", "SQLite 3 (dev)\nPostgreSQL 16 (target)", "Persistent store:\naccounts_user, tickets_ticket,\ntickets_ticketcategory,\ntickets_ticketmessage")
+
+  ' ── Container C5: Cache & Token Store (Future) ──────────
+  ContainerDb(cache, "Cache & Token Store", "Redis 7\n(Not Implemented)", "JWT blacklist, rate-limit\ncounters, Celery broker,\ndashboard query cache")
+
+  ' ── Container C6: Task Worker (Future) ──────────────────
+  Container(queue, "Task Worker", "Celery 5 + Redis\n(Not Implemented)", "Async background processing:\ntransactional emails,\nnotification dispatch")
+}
+
+' ============================================================
+'  USER → CONTAINER RELATIONSHIPS
+' ============================================================
+
+' ── Users → SPA (web UI) ─────────────────────────────────────
+Rel(customer, spa, "Registers, creates tickets,\nmessages, views dashboard", "HTTPS")
+Rel(agent, spa, "Manages tickets, changes\nstatus/priority, converses", "HTTPS")
+Rel(admin, spa, "Manages users/roles/categories,\nassigns agents", "HTTPS")
+
+' ── Superuser → Django Admin ────────────────────────────────
+Rel(superuser, admin_panel, "Manages system via Django Admin", "HTTPS | HTML")
+
+' ── Users → REST API (direct API access) ────────────────────
+Rel(customer, api, "Direct API calls", "REST | JSON/HTTPS")
+Rel(agent, api, "Direct API calls", "REST | JSON/HTTPS")
+Rel(admin, api, "Direct API calls", "REST | JSON/HTTPS")
+
+' ============================================================
+'  INTERNAL CONTAINER → CONTAINER RELATIONSHIPS
+' ============================================================
+
+' ── SPA → REST API ──────────────────────────────────────────
+Rel(spa, api, "All authenticated API requests:\nauth, ticket CRUD, messages,\ndashboard, user management", "REST | JSON/HTTPS")
+
+' ── REST API → Database ─────────────────────────────────────
+Rel(api, db, "ORM CRUD on all entities:\nusers, tickets, messages,\ncategories", "Django ORM → SQL")
+
+' ── Django Admin → Database ─────────────────────────────────
+Rel(admin_panel, db, "Direct ORM-based data CRUD\nvia Django Admin", "Django ORM → SQL")
+
+' ── REST API → Cache (future) ───────────────────────────────
+Rel_R(api, cache, "Check JWT blacklist,\nrate-limit counters\n(future)", "Redis | TCP/6379")
+
+' ── REST API → Task Worker (future) ─────────────────────────
+Rel(api, queue, "Enqueue email notification\njobs (future)", "Celery | AMQP")
+
+' ── Task Worker → Database (future) ─────────────────────────
+Rel(queue, db, "Read user/ticket data\nfor notifications (future)", "Django ORM → SQL")
+
+' ── Task Worker → Cache (future) ────────────────────────────
+Rel_L(queue, cache, "Consume task queue\nvia Redis broker (future)", "Celery → Redis | TCP/6379")
+
+' ============================================================
+'  SYSTEM → EXTERNAL RELATIONSHIPS
+' ============================================================
+
+' ── REST API → Email Service (future) ───────────────────────
+Rel_R(api, email, "Send notification emails\non ticket events (future)", "SMTP / REST | JSON")
+
+' ── Task Worker → Email Service (future) ────────────────────
+Rel(queue, email, "Send transactional emails\nasync (future)", "SMTP / REST | JSON")
+
+' ── Email Service → REST API (webhook callback) ─────────────
+Rel_L(email, api, "Delivery status webhook\ncallbacks (future)", "HTTP | JSON")
+
+' ── Internal Database → External PostgreSQL ─────────────────
+Rel(db, pg_ext, "Production migration target", "SQL | TCP/5432")
+
+' ── SPA → Object Storage (future) ───────────────────────────
+Rel_R(spa, s3, "Upload/download ticket\nattachments (future)", "S3 API | HTTPS")
+
+' ── Object Storage → SPA (serve content) ────────────────────
+Rel(s3, spa, "Serves stored file\ncontent (future)", "HTTPS")
+
+@enduml

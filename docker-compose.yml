@@ -1,24 +1,35 @@
 services:
   backend:
     build:
-      context: ./ticketProject
+      context: ./backend
     container_name: ticket-backend
     ports:
       - "8000:8000"
     volumes:
-      - ./ticketProject:/app
+      - ./backend:/app
+    environment:
+      - DJANGO_DEBUG=True
     command: >
       sh -c "python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/accounts/csrf/')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   frontend:
     build:
-      context: ./ticket-frontend
+      context: ./frontend
     container_name: ticket-frontend
     ports:
       - "5173:5173"
     volumes:
-      - ./ticket-frontend:/app
+      - ./frontend:/app
       - /app/node_modules
+    environment:
+      - VITE_API_PROXY_TARGET=http://backend:8000
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy

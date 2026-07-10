@@ -1,0 +1,105 @@
+@startuml ERD_TicketManagementSystem
+' ===============================================================
+'  Ticket Management System — Entity Relationship Diagram (ERD)
+'  Notation  : Crow's Foot (PlantUML)
+' ===============================================================
+
+skinparam linetype ortho
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Helvetica
+skinparam defaultFontSize 12
+skinparam entity {
+  BackgroundColor #F0F6FF
+  BorderColor #2563EB
+  FontColor #1E3A5F
+  FontSize 13
+  FontStyle bold
+}
+
+title <b>Entity Relationship Diagram</b>\n<size:10>Ticket Management System</size>
+
+' ============================================================
+'  accounts_user  — Custom User Model
+'  Extends Django AbstractUser with a role field
+' ============================================================
+entity "accounts_user" as user {
+  * id: BIGINT <<PK>>
+  --
+  * password: VARCHAR(128)
+  o last_login: DATETIME
+  * is_superuser: BOOLEAN
+  * username: VARCHAR(150) <<UNIQUE>>
+  o first_name: VARCHAR(150)
+  o last_name: VARCHAR(150)
+  o email: VARCHAR(254)
+  * is_staff: BOOLEAN
+  * is_active: BOOLEAN
+  * date_joined: DATETIME
+  * role: VARCHAR(20)
+}
+
+' ============================================================
+'  tickets_ticketcategory  — Ticket Categories
+' ============================================================
+entity "tickets_ticketcategory" as category {
+  * id: BIGINT <<PK>>
+  --
+  * name: VARCHAR(100) <<UNIQUE>>
+}
+
+' ============================================================
+'  tickets_ticket  — Support Tickets
+'  Core entity with status/priority lifecycle
+' ============================================================
+entity "tickets_ticket" as ticket {
+  * id: BIGINT <<PK>>
+  --
+  * title: VARCHAR(255)
+  * description: TEXT
+  * status: VARCHAR(20)
+  * priority: VARCHAR(20)
+  * user_id: BIGINT <<FK>>
+  o assigned_agent_id: BIGINT <<FK>>
+  o category_id: BIGINT <<FK>>
+  * created_at: DATETIME
+  * updated_at: DATETIME
+}
+
+' ============================================================
+'  tickets_ticketmessage  — Messages on a Ticket
+' ============================================================
+entity "tickets_ticketmessage" as message {
+  * id: BIGINT <<PK>>
+  --
+  * ticket_id: BIGINT <<FK>>
+  * sender_id: BIGINT <<FK>>
+  * message: TEXT
+  * created_at: DATETIME
+}
+
+' ============================================================
+'  RELATIONSHIPS  (Crow's Foot Notation)
+'
+'  ||  = exactly one        |o  = zero or one
+'  o{  = zero or more       }|  = one or more
+'
+'  A ||--o{ B  =>  A has zero or more B  /  B belongs to exactly one A
+' ============================================================
+
+' 1) User creates Ticket  (NOT NULL, CASCADE)
+user ||--o{ ticket : "user_id (creator)"
+
+' 2) User assigned as agent to Ticket  (NULL, SET_NULL)
+user |o--o{ ticket : "assigned_agent_id"
+
+' 3) User sends Message  (NOT NULL, CASCADE)
+user ||--o{ message : "sender_id"
+
+' 4) Category groups Ticket  (NULL, SET_NULL)
+category |o--o{ ticket : "category_id"
+
+' 5) Ticket contains Message  (NOT NULL, CASCADE)
+ticket ||--o{ message : "ticket_id"
+
+@enduml
