@@ -75,9 +75,3 @@ desktop.ini
 # Git
 # ==========================
 *.orig
-
-# ==========================
-# Project-specific
-# ==========================
-memory/
-free-claude-code/
