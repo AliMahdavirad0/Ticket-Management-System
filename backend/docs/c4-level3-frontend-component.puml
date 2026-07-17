@@ -1,0 +1,149 @@
+@startuml FrontendComponentDiagram
+!include <C4/C4_Component>
+!include <C4/C4_Context>
+
+LAYOUT_WITH_LEGEND()
+
+title Component Diagram — React SPA (Frontend)
+
+' ============================================================
+'  PERSONAS
+' ============================================================
+Person(customer, "Customer", "Creates & manages own support tickets")
+Person(agent, "Support Agent", "Handles assigned & unassigned tickets")
+Person(admin, "Administrator", "Full system & user management")
+
+' ============================================================
+'  BACKEND SYSTEM (external to SPA)
+' ============================================================
+System_Ext(api, "Django REST API", "Backend API server at /api/\nSession auth + CSRF")
+
+' ============================================================
+'  SYSTEM BOUNDARY — React SPA
+' ============================================================
+System_Boundary(spa, "React Single Page Application") {
+
+  ' ── Auth & Entry ──────────────────────────────────────────
+  Component(main_entry, "App.tsx + main.tsx", "src/App.tsx + main.tsx", "React entry point,\nQueryClient, BrowserRouter,\nroute definitions, auth guards")
+  Component(auth_ctx, "AuthContext", "src/context/AuthContext.tsx", "Auth state management:\nuser, isAuthenticated,\nlogin, logout, refresh,\nsession check on mount")
+
+  ' ── API Layer ─────────────────────────────────────────────
+  Component(axios, "AxiosClient", "src/api/axiosClient.ts", "Axios instance:\nwithCredentials: true,\nCSRF token interceptor,\n401/403 retry logic")
+  Component(auth_api, "AuthApi", "src/api/authApi.ts", "CSRF fetch, login, logout,\nregister, profile,\nuser management API calls")
+  Component(ticket_api, "TicketApi", "src/api/ticketApi.ts", "Ticket CRUD, messages,\ncategories API calls")
+  Component(dash_api, "DashboardApi", "src/api/dashboardApi.ts", "Dashboard overview,\nagent workload API calls")
+
+  ' ── Hooks (TanStack React Query) ──────────────────────────
+  Component(use_auth, "useAuth", "src/hooks/useAuth.ts", "Auth, profile, user mgmt\nquery & mutation hooks")
+  Component(use_tickets, "useTickets", "src/hooks/useTickets.ts", "Tickets, messages, categories\nquery & mutation hooks")
+  Component(use_dash, "useDashboard", "src/hooks/useDashboard.ts", "Dashboard data\nquery hooks")
+
+  ' ── Pages ─────────────────────────────────────────────────
+  Component(page_login, "LoginPage", "src/pages/Login.tsx", "Login form with\nusername + password")
+  Component(page_register, "RegisterPage", "src/pages/Register.tsx", "Registration form")
+  Component(page_dash, "DashboardPage", "src/pages/Dashboard.tsx", "Role-based dashboard\nwith statistics cards")
+  Component(page_tickets, "TicketListPage", "src/pages/Tickets.tsx", "Filtered ticket list\nwith pagination")
+  Component(page_ticket_detail, "TicketDetailPage", "src/pages/TicketDetails.tsx", "Ticket detail view\nwith messages")
+  Component(page_create, "CreateTicketPage", "src/pages/CreateTicket.tsx", "New ticket form")
+  Component(page_profile, "ProfilePage", "src/pages/Profile.tsx", "Profile display & edit")
+  Component(page_users, "AdminUsersPage", "src/pages/AdminUsers.tsx", "Admin: user list\n& role management")
+  Component(page_workload, "AgentWorkloadPage", "src/pages/AdminAgentWorkload.tsx", "Admin: agent workload\nmonitoring")
+  Component(page_categories, "AdminCategoriesPage", "src/pages/AdminCategories.tsx", "Admin: category\nmanagement")
+  Component(page_404, "NotFoundPage", "src/pages/NotFound.tsx", "404 error page")
+
+  ' ── Shared UI Components ──────────────────────────────────
+  Component(layout, "AppLayout", "src/components/AppLayout.tsx", "Main layout wrapper\nwith sidebar + header")
+  Component(sidebar, "Sidebar", "src/components/Sidebar.tsx", "Nav sidebar with\nrole-based menu items")
+  Component(badge, "Badge", "src/components/Badge.tsx", "Status & priority\nbadge component")
+  Component(btn, "Button", "src/components/Button.tsx", "Reusable button\ncomponent")
+  Component(card, "Card", "src/components/Card.tsx", "Reusable card\nwrapper component")
+  Component(input, "Input", "src/components/Input.tsx", "Reusable input\nfield component")
+  Component(select, "Select", "src/components/Select.tsx", "Reusable select\nfield component")
+  Component(textarea, "Textarea", "src/components/Textarea.tsx", "Reusable textarea\nfield component")
+}
+
+' ============================================================
+'  PERSON → PAGE RELATIONSHIPS
+' ============================================================
+Rel(customer, page_login, "Logs in", "HTTPS")
+Rel(customer, page_register, "Registers", "HTTPS")
+Rel(customer, page_dash, "Views dashboard", "HTTPS")
+Rel(customer, page_tickets, "Lists own tickets", "HTTPS")
+Rel(customer, page_ticket_detail, "Views + replies", "HTTPS")
+Rel(customer, page_create, "Creates tickets", "HTTPS")
+Rel(customer, page_profile, "Edits profile", "HTTPS")
+
+Rel(agent, page_login, "Logs in", "HTTPS")
+Rel(agent, page_dash, "Views agent dashboard", "HTTPS")
+Rel(agent, page_tickets, "Assigned + unassigned", "HTTPS")
+Rel(agent, page_ticket_detail, "Views + replies", "HTTPS")
+Rel(agent, page_profile, "Edits profile", "HTTPS")
+
+Rel(admin, page_login, "Logs in", "HTTPS")
+Rel(admin, page_dash, "Views admin dashboard", "HTTPS")
+Rel(admin, page_tickets, "All tickets", "HTTPS")
+Rel(admin, page_ticket_detail, "Views + reassigns", "HTTPS")
+Rel(admin, page_users, "Manages users/roles", "HTTPS")
+Rel(admin, page_workload, "Agent workload", "HTTPS")
+Rel(admin, page_categories, "Manages categories", "HTTPS")
+Rel(admin, page_profile, "Edits profile", "HTTPS")
+
+' ============================================================
+'  INTERNAL RELATIONSHIPS
+' ============================================================
+
+' ── App entry → Routing & Auth ──────────────────────────────
+Rel(main_entry, auth_ctx, "Initializes auth\nprovider on mount", "")
+
+' ── AuthContext → API (on mount) ─────────────────────────────
+Rel(auth_ctx, axios, "GET csrf/ + GET session/\non app mount", "HTTPS")
+
+' ── Page → Hook relationships ───────────────────────────────
+Rel(page_dash, use_dash, "Uses dashboard\nquery hooks", "")
+Rel(page_dash, use_tickets, "Uses ticket stats\nquery hooks", "")
+Rel(page_tickets, use_tickets, "Uses ticket list\nquery hooks", "")
+Rel(page_ticket_detail, use_tickets, "Uses ticket detail\n+ message hooks", "")
+Rel(page_create, use_tickets, "Uses create ticket\nmutation hook", "")
+Rel(page_profile, use_auth, "Uses profile\nquery hooks", "")
+Rel(page_users, use_auth, "Uses user list\n+ role mutations", "")
+Rel(page_workload, use_dash, "Uses agent workload\nquery hooks", "")
+Rel(page_categories, use_tickets, "Uses category\nCRUD hooks", "")
+Rel(page_login, auth_ctx, "Calls login()\non submit", "")
+Rel(page_register, auth_ctx, "Calls register()\nor direct API", "")
+
+' ── Hook → API relationships ────────────────────────────────
+Rel(use_auth, auth_api, "Calls auth/user\nAPI functions", "")
+Rel(use_tickets, ticket_api, "Calls ticket/message\ncategory API functions", "")
+Rel(use_dash, dash_api, "Calls dashboard\nAPI functions", "")
+
+' ── All API modules use the same Axios client ───────────────
+Rel(auth_api, axios, "Uses configured\nAxios instance", "")
+Rel(ticket_api, axios, "Uses configured\nAxios instance", "")
+Rel(dash_api, axios, "Uses configured\nAxios instance", "")
+
+' ── Axios → Backend API ─────────────────────────────────────
+Rel(axios, api, "All HTTP requests\nwith CSRF token + cookies", "REST | JSON/HTTPS")
+
+' ── Layout & Navigation ─────────────────────────────────────
+Rel(main_entry, layout, "Wraps all pages", "")
+Rel(layout, sidebar, "Includes sidebar", "")
+Rel(sidebar, auth_ctx, "Reads user role\nfor menu items", "")
+Rel(sidebar, use_tickets, "Shows unread counts", "")
+
+' ── Pages use shared components ──────────────────────────────
+Rel(page_tickets, badge, "Renders status/\npriority badges", "")
+Rel(page_ticket_detail, badge, "Renders status/\npriority badges", "")
+Rel(page_create, input, "Form inputs", "")
+Rel(page_create, select, "Priority/category\nselect fields", "")
+Rel(page_create, textarea, "Description input", "")
+Rel(page_login, input, "Username/password\ninputs", "")
+Rel(page_login, btn, "Login button", "")
+Rel(page_tickets, btn, "Action buttons", "")
+Rel(page_ticket_detail, btn, "Reply button", "")
+Rel(page_users, btn, "Role update button", "")
+Rel(page_dash, card, "Statistical cards", "")
+Rel(page_profile, card, "Profile cards", "")
+Rel(page_profile, input, "Edit profile\ninputs", "")
+Rel(page_ticket_detail, textarea, "Message reply", "")
+
+@enduml

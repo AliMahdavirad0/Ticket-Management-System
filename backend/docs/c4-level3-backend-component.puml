@@ -1,0 +1,180 @@
+@startuml BackendComponentDiagram
+!include <C4/C4_Component>
+!include <C4/C4_Context>
+
+LAYOUT_WITH_LEGEND()
+
+title Component Diagram — Django REST API (Backend)
+
+' ============================================================
+'  PERSONAS (same as Levels 1 & 2)
+' ============================================================
+Person(customer, "Customer", "Creates & manages own support tickets")
+Person(agent, "Support Agent", "Handles assigned & unassigned tickets")
+Person(admin, "Administrator", "Full system & user management")
+
+' ============================================================
+'  DATABASE  (external to the API)
+' ============================================================
+ContainerDb(db, "Relational Database", "SQLite 3 (dev)\nPostgreSQL 16 (target)", "Persistent store:\naccounts_user, tickets_ticket,\ntickets_ticketcategory,\ntickets_ticketmessage")
+
+' ============================================================
+'  SYSTEM BOUNDARY — Django REST API Server
+' ============================================================
+System_Boundary(api_server, "Django REST API Server") {
+
+  ' ── Account Views Component ────────────────────────────────
+  Component(reg_view, "RegisterView", "accounts/views.py", "POST /api/accounts/register/\nCreates new customer account")
+  Component(profile_view, "UserProfileView", "accounts/views.py", "GET/PATCH /api/accounts/profile/\nView & update own profile")
+  Component(user_list, "UserListView", "accounts/views.py", "GET /api/accounts/users/\nAdmin: list all users (paginated)")
+  Component(user_detail, "UserDetailView", "accounts/views.py", "GET users/{id}/\nAdmin: view user detail")
+  Component(role_update, "UserRoleUpdateView", "accounts/views.py", "PATCH users/{id}/role/\nAdmin: change user role")
+  Component(avail_agents, "AvailableAgentsView", "accounts/views.py", "GET /api/accounts/agents/available/\nAdmin: list agents by workload")
+  Component(chg_pwd, "ChangePasswordView", "accounts/views.py", "POST /api/accounts/change-password/\nChange own password")
+
+  ' ── Session Views Component ────────────────────────────────
+  Component(csrf_view, "csrf_token", "accounts/session_views.py", "GET /api/accounts/csrf/\nSet CSRF cookie")
+  Component(session_check, "session_check", "accounts/session_views.py", "GET /api/accounts/session/\nCheck auth status")
+  Component(login_view, "session_login", "accounts/session_views.py", "POST /api/accounts/session/login/\nAuthenticate + create session")
+  Component(logout_view, "session_logout", "accounts/session_views.py", "POST /api/accounts/session/logout/\nDestroy session")
+
+  ' ── Ticket Views Component ─────────────────────────────────
+  Component(ticket_vs, "TicketViewSet", "tickets/views.py", "Ticket CRUD:\nlist, create, retrieve,\nupdate, delete, change_status,\nassign, change_priority, statistics")
+  Component(category_vs, "TicketCategoryViewSet", "tickets/views.py", "Category CRUD:\nlist (any auth), create (admin),\ndelete (admin)")
+  Component(message_vs, "TicketMessageViewSet", "tickets/views.py", "Message CRUD:\nlist (filter by ticket),\ncreate (with permission check)")
+
+  ' ── Dashboard Views Component ──────────────────────────────
+  Component(dash_overview, "DashboardOverviewView", "dashboard/views.py", "GET /api/dashboard/\nRole-based dashboard data")
+  Component(dash_agents, "AdminAgentWorkloadView", "dashboard/views.py", "GET /api/dashboard/agents/\nAdmin: agent workload stats")
+
+  ' ── Services Layer ─────────────────────────────────────────
+  Component(user_svc, "UserService", "accounts/services/user_service.py", "create_user, get_user_profile,\nget_available_agents,\nupdate_user_role")
+  Component(ticket_svc, "TicketService", "tickets/services/ticket_service.py", "get_tickets_for_user,\ncreate_ticket,\nchange_ticket_status,\nchange_ticket_priority,\nassign_agent_to_ticket,\nget_ticket_statistics")
+  Component(msg_svc, "MessageService", "tickets/services/message_service.py", "get_messages_for_user,\ncreate_message,\nvalidate_message_access")
+  Component(dash_svc, "DashboardService", "dashboard/services/dashboard_service.py", "get_overview (role-based),\nget_agent_workload")
+
+  ' ── Serializers Layer ──────────────────────────────────────
+  Component(account_ser, "Account Serializers", "accounts/serializers.py", "RegisterSerializer, UserSerializer,\nUserProfileSerializer,\nChangePasswordSerializer,\nUserRoleUpdateSerializer,\nLoginSerializer")
+  Component(ticket_ser, "Ticket Serializers", "tickets/serializers.py", "TicketCreateSerializer,\nTicketListSerializer,\nTicketDetailSerializer,\nChangeStatusSerializer,\nAssignSerializer,\nChangePrioritySerializer,\nTicketStatisticsSerializer,\nTicketMessageSerializer,\nTicketCategorySerializer")
+  Component(dash_ser, "Dashboard Serializers", "dashboard/serializers.py", "DashboardOverviewSerializer,\nAgentWorkloadSerializer")
+
+  ' ── Permissions Layer ──────────────────────────────────────
+  Component(account_perm, "Account Permissions", "accounts/permissions.py", "RolePermission, IsAdmin,\nIsAgent, IsCustomer,\nIsAgentOrAdmin,\nIsAuthenticatedNonAdmin")
+  Component(ticket_perm, "Ticket Permissions", "tickets/permissions.py", "IsTicketOwnerOrAgentOrAdmin,\nCanModifyTicket,\nCanDeleteTicket,\nIsMessageOwnerOrTicketParticipant")
+
+  ' ── Infrastructure ─────────────────────────────────────────
+  Component(urls, "URL Router", "ticketProject/urls.py", "Root URL routing +\napp-level urlconfs +\ndrf-spectacular schema")
+  Component(exception, "Exception Handler", "ticketProject/exceptions.py", "Normalized error responses:\n{detail, status_code, errors}")
+}
+
+' ============================================================
+'  PERSON → VIEW RELATIONSHIPS
+' ============================================================
+
+' ── Customer → Account Views ─────────────────────────────────
+Rel(customer, reg_view, "Register", "REST | JSON/HTTPS")
+Rel(customer, profile_view, "View/update profile", "REST | JSON/HTTPS")
+Rel(customer, chg_pwd, "Change password", "REST | JSON/HTTPS")
+Rel(customer, login_view, "Login", "REST | JSON/HTTPS")
+Rel(customer, logout_view, "Logout", "REST | JSON/HTTPS")
+
+' ── Customer → Ticket Views ──────────────────────────────────
+Rel(customer, ticket_vs, "Own tickets CRUD", "REST | JSON/HTTPS")
+Rel(customer, message_vs, "Own ticket messages", "REST | JSON/HTTPS")
+Rel(customer, category_vs, "List categories", "REST | JSON/HTTPS")
+
+' ── Customer → Dashboard ─────────────────────────────────────
+Rel(customer, dash_overview, "Customer dashboard", "REST | JSON/HTTPS")
+
+' ── Agent → All Customer endpoints + more ────────────────────
+Rel(agent, ticket_vs, "Assigned + unassigned tickets\nchange status/priority", "REST | JSON/HTTPS")
+Rel(agent, message_vs, "Accessible ticket messages", "REST | JSON/HTTPS")
+
+' ── Admin → All endpoints ────────────────────────────────────
+Rel(admin, user_list, "List all users", "REST | JSON/HTTPS")
+Rel(admin, user_detail, "View user detail", "REST | JSON/HTTPS")
+Rel(admin, role_update, "Change user roles", "REST | JSON/HTTPS")
+Rel(admin, avail_agents, "Available agents", "REST | JSON/HTTPS")
+Rel(admin, ticket_vs, "All tickets, reassign", "REST | JSON/HTTPS")
+Rel(admin, category_vs, "Manage categories", "REST | JSON/HTTPS")
+Rel(admin, dash_agents, "Agent workload", "REST | JSON/HTTPS")
+
+' ============================================================
+'  INTERNAL RELATIONSHIPS
+' ============================================================
+
+' ── Routing ──────────────────────────────────────────────────
+Rel(urls, reg_view, "Routes to", "")
+Rel(urls, profile_view, "Routes to", "")
+Rel(urls, user_list, "Routes to", "")
+Rel(urls, user_detail, "Routes to", "")
+Rel(urls, role_update, "Routes to", "")
+Rel(urls, avail_agents, "Routes to", "")
+Rel(urls, chg_pwd, "Routes to", "")
+Rel(urls, csrf_view, "Routes to", "")
+Rel(urls, session_check, "Routes to", "")
+Rel(urls, login_view, "Routes to", "")
+Rel(urls, logout_view, "Routes to", "")
+Rel(urls, ticket_vs, "Routes to (router)", "")
+Rel(urls, category_vs, "Routes to (router)", "")
+Rel(urls, message_vs, "Routes to (router)", "")
+Rel(urls, dash_overview, "Routes to", "")
+Rel(urls, dash_agents, "Routes to", "")
+
+' ── Views → Permissions ─────────────────────────────────────
+Rel(ticket_vs, ticket_perm, "Enforces", "")
+Rel(ticket_vs, account_perm, "Enforces", "")
+Rel(message_vs, ticket_perm, "Enforces", "")
+Rel(profile_view, account_perm, "Enforces", "")
+Rel(user_list, account_perm, "Enforces", "")
+Rel(role_update, account_perm, "Enforces", "")
+Rel(avail_agents, account_perm, "Enforces", "")
+Rel(dash_overview, account_perm, "Enforces", "")
+Rel(dash_agents, account_perm, "Enforces", "")
+
+' ── Views → Services ────────────────────────────────────────
+Rel(profile_view, user_svc, "Delegates to", "")
+Rel(user_list, user_svc, "Delegates to", "")
+Rel(role_update, user_svc, "Delegates to", "")
+Rel(avail_agents, user_svc, "Delegates to", "")
+Rel(reg_view, user_svc, "Delegates to", "")
+
+Rel(ticket_vs, ticket_svc, "Delegates business\nlogic to", "")
+Rel(ticket_vs, msg_svc, "Delegates message\naccess to", "")
+Rel(message_vs, msg_svc, "Delegates to", "")
+
+Rel(dash_overview, dash_svc, "Delegates to", "")
+Rel(dash_agents, dash_svc, "Delegates to", "")
+
+' ── DashboardService → TicketService/MessageService ─────────
+Rel(dash_svc, ticket_svc, "Uses for aggregation", "")
+Rel(dash_svc, msg_svc, "Uses for aggregation", "")
+
+' ── Views → Serializers ─────────────────────────────────────
+Rel(ticket_vs, ticket_ser, "Uses", "")
+Rel(message_vs, ticket_ser, "Uses", "")
+Rel(category_vs, ticket_ser, "Uses", "")
+Rel(profile_view, account_ser, "Uses", "")
+Rel(user_list, account_ser, "Uses", "")
+Rel(role_update, account_ser, "Uses", "")
+Rel(reg_view, account_ser, "Uses", "")
+Rel(chg_pwd, account_ser, "Uses", "")
+Rel(dash_overview, dash_ser, "Uses", "")
+Rel(dash_agents, dash_ser, "Uses", "")
+
+' ── Services → Database ─────────────────────────────────────
+Rel(ticket_svc, db, "ORM CRUD", "Django ORM → SQL")
+Rel(msg_svc, db, "ORM CRUD", "Django ORM → SQL")
+Rel(user_svc, db, "ORM CRUD", "Django ORM → SQL")
+Rel(dash_svc, db, "Read-only queries", "Django ORM → SQL")
+
+' ── Views → Exception Handler ───────────────────────────────
+Rel(ticket_vs, exception, "Error normalization", "")
+Rel(profile_view, exception, "Error normalization", "")
+Rel(login_view, exception, "Error normalization", "")
+
+' ── CSRF/Login flow ──────────────────────────────────────────
+Rel(csrf_view, login_view, "Sets CSRF cookie\nrequired before login", "Cookie")
+Rel(login_view, session_check, "Sets session cookie\nchecked by session check", "Cookie")
+
+@enduml

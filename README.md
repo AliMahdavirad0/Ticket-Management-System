@@ -326,6 +326,28 @@ npm run build    # TypeScript check + production build
 
 ---
 
+## Documentation
+
+Comprehensive technical documentation is available in the [`docs/`](docs/) directory.
+
+| Document | Description |
+|----------|-------------|
+| [Documentation Index](docs/README.md) | Full index with navigation and reading order |
+| [Architecture](docs/architecture.md) | System architecture, backend layers, request lifecycle |
+| [C4 Model](docs/c4-model.md) | Context, container, and component diagrams |
+| [Backend Reference](docs/backend.md) | Django apps, services, serializers, views, permissions |
+| [Frontend Reference](docs/frontend.md) | React structure, hooks, API clients, components |
+| [Database](docs/database.md) | Data models, fields, relationships, ER diagram |
+| [API Reference](docs/api-reference.md) | Complete endpoint documentation with examples |
+| [Authentication & RBAC](docs/authentication-and-rbac.md) | Session auth flow, CSRF, roles, permission matrix |
+| [Ticket Workflow](docs/ticket-workflow.md) | Status transitions, lifecycle, role-based rules |
+| [Setup & Development](docs/setup-and-development.md) | Installation, configuration, troubleshooting |
+| [Testing](docs/testing.md) | Test structure, running tests, CI execution |
+| [Deployment](docs/deployment.md) | Docker setup, production recommendations |
+| [Limitations & Roadmap](docs/limitations-and-roadmap.md) | Current limitations and planned improvements |
+
+---
+
 ## Suggested Demo Scenario (5-7 minutes)
 
 1. **Customer login** — `customer1 / Cust123!`

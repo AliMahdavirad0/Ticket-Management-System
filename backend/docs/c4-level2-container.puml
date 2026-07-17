@@ -39,7 +39,7 @@ System_Boundary(tms, "Ticket Management System") {
   ContainerDb(db, "Relational Database", "SQLite 3 (dev)\nPostgreSQL 16 (target)", "Persistent store:\naccounts_user, tickets_ticket,\ntickets_ticketcategory,\ntickets_ticketmessage")
 
   ' ── Container C5: Cache & Token Store (Future) ──────────
-  ContainerDb(cache, "Cache & Token Store", "Redis 7\n(Not Implemented)", "JWT blacklist, rate-limit\ncounters, Celery broker,\ndashboard query cache")
+  ContainerDb(cache, "Cache & Token Store", "Redis 7\n(Not Implemented)", "Session cache, rate-limit\ncounters, Celery broker,\ndashboard query cache")
 
   ' ── Container C6: Task Worker (Future) ──────────────────
   Container(queue, "Task Worker", "Celery 5 + Redis\n(Not Implemented)", "Async background processing:\ntransactional emails,\nnotification dispatch")
@@ -76,7 +76,7 @@ Rel(api, db, "ORM CRUD on all entities:\nusers, tickets, messages,\ncategories",
 Rel(admin_panel, db, "Direct ORM-based data CRUD\nvia Django Admin", "Django ORM → SQL")
 
 ' ── REST API → Cache (future) ───────────────────────────────
-Rel_R(api, cache, "Check JWT blacklist,\nrate-limit counters\n(future)", "Redis | TCP/6379")
+Rel_R(api, cache, "Cache session data,\nrate-limit counters\n(future)", "Redis | TCP/6379")
 
 ' ── REST API → Task Worker (future) ─────────────────────────
 Rel(api, queue, "Enqueue email notification\njobs (future)", "Celery | AMQP")

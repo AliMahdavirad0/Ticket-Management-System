@@ -9,8 +9,9 @@
 - [۱. Entity Relationship Diagram (ERD)](#1-entity-relationship-diagram-erd)
 - [۲. C4 سطح ۱ — دیاگرام بافت سیستم (System Context)](#2-c4-سطح-۱--دیاگرام-بافت-سیستم-system-context)
 - [۳. C4 سطح ۲ — دیاگرام کانتینر (Container Diagram)](#3-c4-سطح-۲--دیاگرام-کانتینر-container-diagram)
-- [۴. تصمیمات معماری](#4-تصمیمات-معماری)
-- [۵. مراجع و فایل‌های مرتبط](#5-مراجع-و-فایلهای-مرتبط)
+- [۴. C4 سطح ۳ — دیاگرام کامپوننت (Component Diagram)](#4-c4-سطح-۳--دیاگرام-کامپوننت-component-diagram)
+- [۵. تصمیمات معماری](#5-تصمیمات-معماری)
+- [۶. مراجع و فایل‌های مرتبط](#6-مراجع-و-فایلهای-مرتبط)
 
 ---
 
@@ -201,7 +202,7 @@ Rel(s3, tms_system, "Serves stored file content on request (future)", "HTTPS")
 | C2 | Django REST API Server | موجود | Django 6, DRF 3.17, django-filter, drf-spectacular 0.29, django-cors-headers 4.7 | هسته API با معماری لایه‌ای View → Service → Model → DB |
 | C3 | Django Admin Interface | موجود | Django 6 Admin Templates | پنل مدیریتی در /admin/ برای CRUD مستقیم |
 | C4 | Relational Database | SQLite / PostgreSQL | SQLite 3 (dev) / PostgreSQL 16 (target) | ذخیره‌سازی: accounts_user, tickets_ticket, tickets_ticketcategory, tickets_ticketmessage |
-| C5 | Cache & Token Store | آینده | Redis 7 | JWT blacklist, rate-limit counters, Celery broker, dashboard cache |
+| C5 | Cache & Token Store | آینده | Redis 7 | Session cache, rate-limit counters, Celery broker, dashboard cache |
 | C6 | Task Worker | آینده | Celery 5 + Redis | پردازش ناهمگام ایمیل‌ها و اعلان‌ها |
 
 ### روابط
@@ -223,7 +224,7 @@ Rel(s3, tms_system, "Serves stored file content on request (future)", "HTTPS")
 | SPA | REST API | تمام درخواست‌های API | REST \| JSON/HTTPS |
 | REST API | Database | ORM CRUD روی تمام موجودیت‌ها | Django ORM → SQL |
 | Admin Panel | Database | CRUD از طریق Django Admin | Django ORM → SQL |
-| REST API | Cache | بررسی JWT blacklist (آینده) | Redis \| TCP/6379 |
+| REST API | Cache | ذخیره داده جلسه (آینده) | Redis \| TCP/6379 |
 | REST API | Task Worker | ارسال job ایمیل (آینده) | Celery \| AMQP |
 | Task Worker | Database | خواندن داده کاربر/تیکت (آینده) | Django ORM → SQL |
 | Task Worker | Cache | مصرف صف از طریق Redis broker (آینده) | Celery → Redis \| TCP/6379 |
@@ -270,7 +271,7 @@ System_Boundary(tms, "Ticket Management System") {
 
   ContainerDb(db, "Relational Database", "SQLite 3 (dev)\nPostgreSQL 16 (target)", "Persistent store:\naccounts_user, tickets_ticket,\ntickets_ticketcategory,\ntickets_ticketmessage")
 
-  ContainerDb(cache, "Cache & Token Store", "Redis 7\n(Not Implemented)", "JWT blacklist, rate-limit\ncounters, Celery broker,\ndashboard query cache")
+  ContainerDb(cache, "Cache & Token Store", "Redis 7\n(Not Implemented)", "Session cache, rate-limit\ncounters, Celery broker,\ndashboard query cache")
 
   Container(queue, "Task Worker", "Celery 5 + Redis\n(Not Implemented)", "Async background processing:\ntransactional emails,\nnotification dispatch")
 }
@@ -286,7 +287,7 @@ Rel(admin, api, "Direct API calls", "REST | JSON/HTTPS")
 Rel(spa, api, "All authenticated API requests:\nauth, ticket CRUD, messages,\ndashboard, user management", "REST | JSON/HTTPS")
 Rel(api, db, "ORM CRUD on all entities:\nusers, tickets, messages,\ncategories", "Django ORM → SQL")
 Rel(admin_panel, db, "Direct ORM-based data CRUD\nvia Django Admin", "Django ORM → SQL")
-Rel_R(api, cache, "Check JWT blacklist,\nrate-limit counters\n(future)", "Redis | TCP/6379")
+Rel_R(api, cache, "Cache session data,\nrate-limit counters\n(future)", "Redis | TCP/6379")
 Rel(api, queue, "Enqueue email notification\njobs (future)", "Celery | AMQP")
 Rel(queue, db, "Read user/ticket data\nfor notifications (future)", "Django ORM → SQL")
 Rel_L(queue, cache, "Consume task queue\nvia Redis broker (future)", "Celery → Redis | TCP/6379")
@@ -305,7 +306,245 @@ Rel(s3, spa, "Serves stored file\ncontent (future)", "HTTPS")
 
 ---
 
-## 4. تصمیمات معماری
+## 4. C4 سطح ۳ — دیاگرام کامپوننت (Component Diagram)
+
+<div align="center">
+
+![C4 Level 3 - Backend Component Diagram](https://www.plantuml.com/plantuml/png/bLJ1Rjim4BtxAuQkB0O22rfGYgbm1gAqVjPJeOLHjJHNkecYw05AlWPVsJfkbADEWv7XSyQoKiwrH7DJOeHKyFUOhFtojR0iyE4bNqPAQFyVnOdmSU5GMsp1KGN8pd9C1JqrzIpQ9LlyeCr3eLFNsvubEmGQ9gghR4BxGNPmsupg1v-_3M_fAH4FEyfnz0-K1HY0gV8LQcTPqYSfY_HNCEZWN2Z5IJje4qlxDJ7rSj6XqY5xJQVW9sWCn6_iRmH2vIeGOeUSv72T_2oJNGFCiRZ7_MWmIJqVxY77_ow1W8HELRi6KHj5DOBNRYw2wjH7A84iDDGB2BywGKC_0afBWQ2WDn-SGElYqMWFrPMhKBWsRBs9AVFp_yHq0M7azq8cXRb3nQk0gQOvSQ2Wxz3N5T7U-Pn95_hLRw4DMmRTd3jkmh3jss5J-0OX0gqG5dDR4K5M3BSEcVPxjYlb3hU71smlaQ7RnVqGYKZ8-7Z3h3ta1qY4whrj2leHVBJxjBr0gQVpAXKM1H4pQKJAVZyTkPq7bR7W3tHwFXwKCy7_OxQrP8-0VrMj_ko0YoafSfMaDXaJqYpNmk5qLq3xV_GaB9L8x8vSTlQ8DMceOhGKGNR2Fr5D6MpcW3P3vxj0U7jY7MdgvQv-hXXqIYF-1k2h_iWXwYHG8nsNY7AjJ7AtI-4RlOM2pnRwBwcXH2r7Zx7G2NrbRMcn-ioNG3ID6zFSbB7_DTtyWDEcWAFQnYgH8UN_XPVF8n7UrPBD3Jd7zW__m7ZrF0K30tMK0gUVvV5Z9jOp1TBsMMYHHXIO7d6JC8PqHKXa-KQFxtHE7U4m4ARtLpJR-7s5nsVgM3OUFIzjw3nYxtPsAph1LG5HMnvO-KLjc9tWNqxVvQphdsP7nKFpDxFhrq15suQ5bYjZ9vGqQN8A1G66xOUEY9WLDcjqLi_XSNyyh0ax8bLnxRlVEAvhxk8ldzVvzh_uRgYMKqE1ZIF0FnBEhQY92BZ1GLgF8QfeJz8RWWPgA_pRkBNrFClh5lRbb2yCkOK7DSDL1BxCDBOHJz64DWK2__oQNFgq4TlG1GSjTQpkLxkB-pLwY9vPvGBAGqAwJ1MsD9HBTZXHmNtGR7FF_J6G4EfWDA5qMQHHxtdlMErVJSTQbPMFfUbChPJBnjHNA-X60FmgE5EPFkJCi_X3PZFNrTIf0B_nI76v2nMs93YUOwJ5Bp5C2n_NH4j1vUOJqR59qPBjGsjbt_K2Nc8j4HrVNCm4E4v7LYn4S_Ih3dnC-fy2AqEwBqHBc4lPFqgBFxBXSnQwMqauPQTMnFi0)
+
+</div>
+
+<div align="center">
+
+![C4 Level 3 - Frontend Component Diagram](https://www.plantuml.com/plantuml/png/jLRDRnD15BxlL-nAD-UdSXMhIExJYP5zTJR4CD6GbL8PXJCq3Se2MXVV0iSaMnI5YFKg3Y-T-67frJQBL6MYPGKF6h6jW_REDazYFQTw_2GslqEfx9sksM-pxHjI5ZXigif8tSBqP0YWbFmOC2WA-rn0fnOLjOkm6IajpVj3WhgQyQmWrhE_WCRDGv8vULJOF1-Yl0NrN0e9tPcUMpVNKyqDO6Id46dPwGGzgQwR-4w5OQZ_TE89OZW2ys7Sn2U7XJ_W_G5PjxLMFB9MYmAmj9Twn8b5-7AjtEglWNnMHFw0C4tjyNHChG2Bm1VNGZIS_qBfaEw9CDsKYGyLn_lqy3xW2DdIH90jL_UmHvnL6rXF7j9r5lYhPjA0FYqOG5flgMqHn_XFmZJSQuK0AqMdfQCfrWXqMjxndOapwnXHMbkCB5EXqy7QAU_mHTDGYUGqT8JclgD4HY-6pE_2Ay49f0JDF4V2gtTkz_Sch9Oe6RsAEyl_45ABjJ-46YMVq50-yEqRrgS_9qLDnB0nPZOvEQLJE7j5aVjEFOEB8wuN66gn0bFK1PksQVAPnfSSN3rY0-wCBBF8Hz43PSY0xLGGQku70dYcH7_cYlKdB8Ue0tdQLalNMS5c7dY6jqXhk3eP_7_HJEMCd8EAO_5AjrYnjEqKl_L3qBJ-K-ZEKaW7E5SW0ODN-5BCZfH34gjCnVy7mYQJgWzIB7sjQ3BPt8KFNdxYZmtUfns1Lx26HeNMJY1OkLZGN4-MxGYV5Z5SlOA9wIFly-OyrvRrFRVCyX9otBKGm3v_-AdP4NDCWcjZBQCOrLnY6Ytmm0Y-8HqM1MmLWIBmYs24qFknA0UVQIE_q2pqMMqNNFYZZWV_WMYpUW5uQ-2ZQ2t2f7VDBLbF6Av6PixOd4C2CL5y8GzMXy6E5BpCr4q7vn7tFB-Uv6Vj5vjHi5qflMqxlEXJddvPkW7Tv-8n5w_xQVK2lFMkUBPxJ9DA5wS7FeFyYalr2r4SDTv3sUHTFyI8HC_JKRB6BymyPB_K3UG3QJkFNQBwnQ1LS2gh3SHdLsFoQSMoGGyce0_IZAHxtn-IL0s4L45GdhrxI2x9dTKpOQ-OAi4zmXk5QRq0LF9ldL_1_Jo5I7eHpdnyyBC17EahgNymcN_jgsnDFqj-kZijDHl4SMZ3R4OjMUEPhJv15wWJCA3hPHMdX-WB6B7GZFa-EsZ1--FxfNm00)
+
+</div>
+
+### کامپوننت‌های بک‌اند
+
+دیاگرام بالا، کانتینر **Django REST API Server** را به کامپوننت‌های داخلی تفکیک می‌کند:
+
+| لایه | کامپوننت‌ها | توضیح |
+|------|------------|-------|
+| **Views** | Account Views (7), Session Views (4), TicketViewSet, TicketCategoryViewSet, TicketMessageViewSet, Dashboard Views (2) | نقاط ورودی HTTP که درخواست‌ها را دریافت و پاسخ می‌دهند |
+| **Services** | UserService (4 متد), TicketService (6 متد), MessageService (3 متد), DashboardService (2 متد) | منطق تجاری، اعتبارسنجی و تجمیع داده |
+| **Serializers** | Account Serializers (6), Ticket Serializers (9), Dashboard Serializers (2) | تبدیل داده بین درخواست/پاسخ و مدل‌ها |
+| **Permissions** | Account Permissions (6 کلاس), Ticket Permissions (4 کلاس) | کنترل دسترسی مبتنی بر نقش |
+| **Infrastructure** | URL Router, Exception Handler | مسیریابی و مدیریت خطا |
+
+### کامپوننت‌های فرانت‌اند
+
+دیاگرام بالا، کانتینر **Single Page Application** را به کامپوننت‌های داخلی تفکیک می‌کند:
+
+| لایه | کامپوننت‌ها | توضیح |
+|------|------------|-------|
+| **Pages** | Login, Register, Dashboard, TicketList, TicketDetail, CreateTicket, Profile, AdminUsers, AgentWorkload, AdminCategories, NotFound | ۱۱ صفحه مجزا با مسیریابی React Router |
+| **Hooks** | useAuth, useTickets, useDashboard | هوک‌های TanStack React Query برای مدیریت وضعیت سرور |
+| **API Layer** | AxiosClient, AuthApi, TicketApi, DashboardApi | لایه ارتباط با بک‌اند از طریق Axios |
+| **Context** | AuthContext | مدیریت وضعیت احراز هویت (user, isAuthenticated, login, logout) |
+| **Components** | AppLayout, Sidebar, Badge, Button, Card, Input, Select, Textarea | کامپوننت‌های اشتراکی UI |
+
+<details>
+<summary><b>مشاهده کد منبع PlantUML — docs/c4-level3-backend-component.puml</b></summary>
+
+```plantuml
+@startuml BackendComponentDiagram
+!include <C4/C4_Component>
+!include <C4/C4_Context>
+
+LAYOUT_WITH_LEGEND()
+
+title Component Diagram — Django REST API (Backend)
+
+Person(customer, "Customer", "Creates & manages own support tickets")
+Person(agent, "Support Agent", "Handles assigned & unassigned tickets")
+Person(admin, "Administrator", "Full system & user management")
+
+ContainerDb(db, "Relational Database", "SQLite 3 (dev)\nPostgreSQL 16 (target)", "Persistent store")
+
+System_Boundary(api_server, "Django REST API Server") {
+
+  Component(reg_view, "RegisterView", "accounts/views.py", "POST /api/accounts/register/")
+  Component(profile_view, "UserProfileView", "accounts/views.py", "GET/PATCH /api/accounts/profile/")
+  Component(user_list, "UserListView", "accounts/views.py", "GET /api/accounts/users/")
+  Component(user_detail, "UserDetailView", "accounts/views.py", "GET users/{id}/")
+  Component(role_update, "UserRoleUpdateView", "accounts/views.py", "PATCH users/{id}/role/")
+  Component(avail_agents, "AvailableAgentsView", "accounts/views.py", "GET /api/accounts/agents/available/")
+  Component(chg_pwd, "ChangePasswordView", "accounts/views.py", "POST /api/accounts/change-password/")
+
+  Component(csrf_view, "csrf_token", "accounts/session_views.py", "GET /api/accounts/csrf/")
+  Component(session_check, "session_check", "accounts/session_views.py", "GET /api/accounts/session/")
+  Component(login_view, "session_login", "accounts/session_views.py", "POST /api/accounts/session/login/")
+  Component(logout_view, "session_logout", "accounts/session_views.py", "POST /api/accounts/session/logout/")
+
+  Component(ticket_vs, "TicketViewSet", "tickets/views.py", "Ticket CRUD + actions")
+  Component(category_vs, "TicketCategoryViewSet", "tickets/views.py", "Category CRUD")
+  Component(message_vs, "TicketMessageViewSet", "tickets/views.py", "Message CRUD")
+
+  Component(dash_overview, "DashboardOverviewView", "dashboard/views.py", "GET /api/dashboard/")
+  Component(dash_agents, "AdminAgentWorkloadView", "dashboard/views.py", "GET /api/dashboard/agents/")
+
+  Component(user_svc, "UserService", "accounts/services/user_service.py", "create_user, get_user_profile,\nget_available_agents,\nupdate_user_role")
+  Component(ticket_svc, "TicketService", "tickets/services/ticket_service.py", "get_tickets_for_user, create_ticket,\nchange_ticket_status/priority,\nassign_agent, get_statistics")
+  Component(msg_svc, "MessageService", "tickets/services/message_service.py", "get_messages, create_message,\nvalidate_message_access")
+  Component(dash_svc, "DashboardService", "dashboard/services/dashboard_service.py", "get_overview, get_agent_workload")
+
+  Component(account_ser, "Account Serializers", "accounts/serializers.py", "6 serializers")
+  Component(ticket_ser, "Ticket Serializers", "tickets/serializers.py", "9 serializers")
+  Component(dash_ser, "Dashboard Serializers", "dashboard/serializers.py", "2 serializers")
+
+  Component(account_perm, "Account Permissions", "accounts/permissions.py", "6 permission classes")
+  Component(ticket_perm, "Ticket Permissions", "tickets/permissions.py", "4 permission classes")
+
+  Component(urls, "URL Router", "ticketProject/urls.py", "Root + app-level routing")
+  Component(exception, "Exception Handler", "ticketProject/exceptions.py", "Normalized error responses")
+}
+
+Rel(customer, reg_view, "Register", "")
+Rel(customer, login_view, "Login", "")
+Rel(customer, ticket_vs, "Own tickets", "")
+Rel(customer, message_vs, "Own messages", "")
+Rel(customer, dash_overview, "Dashboard", "")
+
+Rel(agent, ticket_vs, "Assigned + unassigned", "")
+Rel(agent, message_vs, "Accessible msgs", "")
+
+Rel(admin, user_list, "List users", "")
+Rel(admin, role_update, "Change roles", "")
+Rel(admin, ticket_vs, "All tickets", "")
+Rel(admin, dash_agents, "Workload", "")
+
+Rel(ticket_vs, ticket_perm, "Enforces", "")
+Rel(ticket_vs, account_perm, "Enforces", "")
+Rel(ticket_vs, ticket_svc, "Delegates to", "")
+Rel(ticket_vs, msg_svc, "Delegates to", "")
+Rel(ticket_vs, ticket_ser, "Uses", "")
+
+Rel(message_vs, ticket_perm, "Enforces", "")
+Rel(message_vs, msg_svc, "Delegates to", "")
+
+Rel(profile_view, user_svc, "Delegates to", "")
+Rel(user_list, user_svc, "Delegates to", "")
+Rel(role_update, user_svc, "Delegates to", "")
+Rel(profile_view, account_perm, "Enforces", "")
+
+Rel(dash_overview, dash_svc, "Delegates to", "")
+Rel(dash_agents, dash_svc, "Delegates to", "")
+Rel(dash_svc, ticket_svc, "Uses for aggregation", "")
+Rel(dash_svc, msg_svc, "Uses for aggregation", "")
+
+Rel(ticket_svc, db, "ORM CRUD", "")
+Rel(msg_svc, db, "ORM CRUD", "")
+Rel(user_svc, db, "ORM CRUD", "")
+Rel(dash_svc, db, "Read-only", "")
+
+Rel(urls, ticket_vs, "Routes to", "")
+Rel(urls, dash_overview, "Routes to", "")
+
+@enduml
+```
+
+</details>
+
+<details>
+<summary><b>مشاهده کد منبع PlantUML — docs/c4-level3-frontend-component.puml</b></summary>
+
+```plantuml
+@startuml FrontendComponentDiagram
+!include <C4/C4_Component>
+!include <C4/C4_Context>
+
+LAYOUT_WITH_LEGEND()
+
+title Component Diagram — React SPA (Frontend)
+
+Person(customer, "Customer", "Creates & manages own support tickets")
+Person(agent, "Support Agent", "Handles assigned & unassigned tickets")
+Person(admin, "Administrator", "Full system & user management")
+System_Ext(api, "Django REST API", "Backend at /api/\nSession auth + CSRF")
+
+System_Boundary(spa, "React Single Page Application") {
+
+  Component(main_entry, "App.tsx + main.tsx", "src/", "Entry, routing, auth guards")
+  Component(auth_ctx, "AuthContext", "src/context/AuthContext.tsx", "Auth state management")
+
+  Component(axios, "AxiosClient", "src/api/axiosClient.ts", "Axios + CSRF interceptor")
+  Component(auth_api, "AuthApi", "src/api/authApi.ts", "Auth/profile/user API")
+  Component(ticket_api, "TicketApi", "src/api/ticketApi.ts", "Ticket/message/category API")
+  Component(dash_api, "DashboardApi", "src/api/dashboardApi.ts", "Dashboard API")
+
+  Component(use_auth, "useAuth", "src/hooks/useAuth.ts", "Auth query/mutation hooks")
+  Component(use_tickets, "useTickets", "src/hooks/useTickets.ts", "Ticket query/mutation hooks")
+  Component(use_dash, "useDashboard", "src/hooks/useDashboard.ts", "Dashboard query hooks")
+
+  Component(p1, "LoginPage", "src/pages/Login.tsx", "")
+  Component(p2, "RegisterPage", "src/pages/Register.tsx", "")
+  Component(p3, "DashboardPage", "src/pages/Dashboard.tsx", "")
+  Component(p4, "TicketListPage", "src/pages/Tickets.tsx", "")
+  Component(p5, "TicketDetailPage", "src/pages/TicketDetails.tsx", "")
+  Component(p6, "CreateTicketPage", "src/pages/CreateTicket.tsx", "")
+  Component(p7, "ProfilePage", "src/pages/Profile.tsx", "")
+  Component(p8, "AdminUsersPage", "src/pages/AdminUsers.tsx", "")
+  Component(p9, "AgentWorkloadPage", "src/pages/AdminAgentWorkload.tsx", "")
+  Component(p10, "AdminCategoriesPage", "src/pages/AdminCategories.tsx", "")
+  Component(p11, "NotFoundPage", "src/pages/NotFound.tsx", "")
+
+  Component(layout, "AppLayout", "src/components/AppLayout.tsx", "Main layout + sidebar")
+  Component(badge, "Badge", "src/components/Badge.tsx", "Status/priority badge")
+  Component(btn, "Button", "src/components/Button.tsx", "Reusable button")
+  Component(card, "Card", "src/components/Card.tsx", "Reusable card")
+  Component(input, "Input", "src/components/Input.tsx", "Reusable input")
+  Component(select, "Select", "src/components/Select.tsx", "Reusable select")
+  Component(textarea, "Textarea", "src/components/Textarea.tsx", "Reusable textarea")
+}
+
+Rel(customer, p1, "Logs in", "")
+Rel(customer, p3, "Dashboard", "")
+Rel(customer, p4, "Own tickets", "")
+Rel(customer, p5, "View + reply", "")
+Rel(customer, p6, "Create ticket", "")
+Rel(agent, p1, "Logs in", "")
+Rel(agent, p4, "Assigned tickets", "")
+Rel(admin, p8, "User management", "")
+Rel(admin, p9, "Workload", "")
+Rel(admin, p10, "Categories", "")
+
+Rel(main_entry, auth_ctx, "Initializes auth", "")
+Rel(auth_ctx, axios, "CSRF + session check", "")
+
+Rel(p3, use_dash, "Uses", "")
+Rel(p4, use_tickets, "Uses", "")
+Rel(p5, use_tickets, "Uses", "")
+Rel(p6, use_tickets, "Uses", "")
+Rel(p1, auth_ctx, "Calls login()", "")
+Rel(p8, use_auth, "Uses", "")
+Rel(p9, use_dash, "Uses", "")
+Rel(p10, use_tickets, "Uses", "")
+
+Rel(use_auth, auth_api, "Calls", "")
+Rel(use_tickets, ticket_api, "Calls", "")
+Rel(use_dash, dash_api, "Calls", "")
+Rel(auth_api, axios, "Uses", "")
+Rel(ticket_api, axios, "Uses", "")
+Rel(dash_api, axios, "Uses", "")
+Rel(axios, api, "HTTP requests", "")
+
+Rel(main_entry, layout, "Wraps pages", "")
+Rel(p4, badge, "Renders", "")
+Rel(p5, badge, "Renders", "")
+Rel(p5, textarea, "Reply input", "")
+Rel(p3, card, "Stats cards", "")
+Rel(p1, btn, "Login button", "")
+Rel(p1, input, "Form inputs", "")
+
+@enduml
+```
+
+</details>
+
+---
+
+## 5. تصمیمات معماری
 
 ### معماری کلی
 
@@ -340,7 +579,7 @@ Rel(s3, spa, "Serves stored file\ncontent (future)", "HTTPS")
 
 ---
 
-## 5. مراجع و فایل‌های مرتبط
+## 6. مراجع و فایل‌های مرتبط
 
 ### فایل‌های PlantUML
 
@@ -349,6 +588,8 @@ Rel(s3, spa, "Serves stored file\ncontent (future)", "HTTPS")
 | `docs/erd.puml` | ERD با نمادگذاری Crow's Foot — ۴ موجودیت، ۵ رابطه |
 | `docs/c4-level1-context.puml` | C4 سطح ۱ — بافت سیستم |
 | `docs/c4-level2-container.puml` | C4 سطح ۲ — کانتینر (۶ کانتینر) |
+| `docs/c4-level3-backend-component.puml` | C4 سطح ۳ — کامپوننت‌های بک‌اند |
+| `docs/c4-level3-frontend-component.puml` | C4 سطح ۳ — کامپوننت‌های فرانت‌اند |
 
 ### نحوه رندر
 
@@ -360,6 +601,27 @@ Rel(s3, spa, "Serves stored file\ncontent (future)", "HTTPS")
 4. **تصاویر رندر شده:** تصاویر PNG بالا از سرور رسمی PlantUML دریافت شده‌اند
 
 > **توجه:** دیاگرام‌های C4 نیاز به کتابخانه `C4-PlantUML` دارند که سرور PlantUML آن را به صورت خودکار از مخزن رسمی بارگذاری می‌کند. اتصال اینترنت برای رندر این دیاگرام‌ها لازم است.
+
+---
+
+### مستندات جامع (انگلیسی)
+
+| سند | توضیح |
+|-----|-------|
+| [`docs/architecture.md`](../docs/architecture.md) | معماری سیستم با دیاگرام‌های Mermaid |
+| [`docs/c4-model.md`](../docs/c4-model.md) | مدل C4 کامل (سطوح ۱، ۲، ۳) |
+| [`docs/backend.md`](../docs/backend.md) | مرجع کامل بک‌اند Django |
+| [`docs/frontend.md`](../docs/frontend.md) | مرجع کامل فرانت‌اند React |
+| [`docs/database.md`](../docs/database.md) | مدل داده و ERD |
+| [`docs/api-reference.md`](../docs/api-reference.md) | مستندات کامل API |
+| [`docs/authentication-and-rbac.md`](../docs/authentication-and-rbac.md) | احراز هویت و مجوزهای دسترسی |
+| [`docs/ticket-workflow.md`](../docs/ticket-workflow.md) | گردش کار تیکت‌ها |
+| [`docs/setup-and-development.md`](../docs/setup-and-development.md) | راه‌اندازی و توسعه |
+| [`docs/testing.md`](../docs/testing.md) | راهنمای تست‌ها |
+| [`docs/deployment.md`](../docs/deployment.md) | استقرار در تولید |
+| [`docs/limitations-and-roadmap.md`](../docs/limitations-and-roadmap.md) | محدودیت‌ها و نقشه راه |
+
+مستندات کامل و به‌روز به زبان انگلیسی در [`docs/`](../docs/) (ریشه پروژه) در دسترس است.
 
 ---
 
