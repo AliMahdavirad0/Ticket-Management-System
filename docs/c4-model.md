@@ -64,7 +64,7 @@ flowchart TD
         
         Backend["Django REST API\n[Container: Python/Django]\nDRF API with session auth\nPort 8000"]
 
-        DB[(SQLite Database\n[Container: SQLite]\nFile-based database\nbackend/db.sqlite3)]
+        DB[(SQLite Database\nFile-based database\nbackend/db.sqlite3)]
 
         APIDocs["Swagger UI / ReDoc\n[Container: drf-spectacular]\nInteractive API docs\n/api/docs/ | /api/redoc/"]
     end
