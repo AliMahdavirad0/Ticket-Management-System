@@ -1,0 +1,12 @@
+flowchart TD
+    Actor["User (Browser)"]
+    subgraph TMS["Ticket Management System"]
+        Frontend["React Frontend\n[Container: TypeScript/Vite]\nSPA Port 5173"]
+        Backend["Django REST API\n[Container: Python/Django]\nDRF + Session Auth\nPort 8000"]
+        DB[("SQLite Database\nbackend/db.sqlite3")]
+        APIDocs["Swagger UI / ReDoc\n[drf-spectacular]\n/api/docs/ | /api/redoc/"]
+    end
+    Actor -->|"HTTP :5173"| Frontend
+    Frontend -->|"HTTP /api/* proxy"| Backend
+    Backend -->|"Django ORM"| DB
+    Backend -->|"OpenAPI schema"| APIDocs

@@ -1,0 +1,198 @@
+---
+pid: 24188
+cwd: "C:\\Users\\USER\\PycharmProjects\\DjangoProject"
+command: "cd \"c:\\Users\\USER\\PycharmProjects\\DjangoProject\\backend\"; ..\\.venv\\Scripts\\python.exe manage.py test accounts.tests tickets.tests dashboard.tests -v 2 2>&1 | Tee-Object -FilePath \"c:\\Users\\USER\\PycharmProjects\\DjangoProject\\docs\\_test_raw.txt\""
+started_at: 2026-07-18T07:54:34.920Z
+running_for_ms: 114520   
+---
+..\.venv\Scripts\python.exe : Creating test database for alias 'default' 
+('file:memorydb_default?mode=memory&cache=shared')...
+At C:\Users\USER\AppData\Local\Temp\ps-script-1437034b-eaf4-41ef-a2ee-93dff200c9bb.ps1:104 char:59
++ ... t\backend"; ..\.venv\Scripts\python.exe manage.py test accounts.tests ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Creating test d...che=shared')...:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Found 77 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: corsheaders, django_filters, drf_spectacular, messages, rest_framework, staticfiles
+  Apply all migrations: accounts, admin, auth, contenttypes, sessions, tickets
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying accounts.0001_initial... OK
+  Applying accounts.0002_alter_user_role... OK
+  Applying accounts.0003_alter_user_options... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying sessions.0001_initial... OK
+  Applying tickets.0001_initial... OK
+  Applying tickets.0002_rename_message_ticketmessage_content_and_more... OK
+  Applying tickets.0003_alter_ticket_options_alter_ticketmessage_options_and_more... OK
+test_available_agents_as_admin (accounts.tests.AccountsAPITestCase.test_available_agents_as_admin) ... ok
+test_available_agents_as_customer_forbidden 
+(accounts.tests.AccountsAPITestCase.test_available_agents_as_customer_forbidden) ... WARNING 2026-07-18 11:24:44,339 
+log Forbidden: /api/accounts/agents/available/
+ok
+test_change_password_success (accounts.tests.AccountsAPITestCase.test_change_password_success) ... ok
+test_change_password_wrong_old_password (accounts.tests.AccountsAPITestCase.test_change_password_wrong_old_password) 
+... WARNING 2026-07-18 11:24:48,558 log Bad Request: /api/accounts/change-password/
+ok
+test_list_users_as_admin (accounts.tests.AccountsAPITestCase.test_list_users_as_admin) ... ok
+test_list_users_as_customer_forbidden (accounts.tests.AccountsAPITestCase.test_list_users_as_customer_forbidden) ... 
+WARNING 2026-07-18 11:24:51,055 log Forbidden: /api/accounts/users/
+ok
+test_login_invalid_credentials (accounts.tests.AccountsAPITestCase.test_login_invalid_credentials) ... WARNING 
+2026-07-18 11:24:52,667 log Unauthorized: /api/accounts/session/login/
+ok
+test_login_success (accounts.tests.AccountsAPITestCase.test_login_success) ... ok
+test_profile_authenticated (accounts.tests.AccountsAPITestCase.test_profile_authenticated) ... ok
+test_profile_unauthenticated (accounts.tests.AccountsAPITestCase.test_profile_unauthenticated) ... WARNING 2026-07-18 
+11:24:57,023 log Unauthorized: /api/accounts/profile/
+ok
+test_register_password_mismatch (accounts.tests.AccountsAPITestCase.test_register_password_mismatch) ... WARNING 
+2026-07-18 11:24:58,508 log Bad Request: /api/accounts/register/
+ok
+test_register_success (accounts.tests.AccountsAPITestCase.test_register_success) ... ok
+test_update_profile (accounts.tests.AccountsAPITestCase.test_update_profile) ... ok
+test_update_user_role_as_admin (accounts.tests.AccountsAPITestCase.test_update_user_role_as_admin) ... ok
+test_update_user_role_as_customer_forbidden 
+(accounts.tests.AccountsAPITestCase.test_update_user_role_as_customer_forbidden) ... WARNING 2026-07-18 11:25:03,958 
+log Forbidden: /api/accounts/users/2/role/
+ok
+test_user_detail_as_admin (accounts.tests.AccountsAPITestCase.test_user_detail_as_admin) ... ok
+test_create_user (accounts.tests.UserServiceTestCase.test_create_user) ... ok
+test_create_user_duplicate_username (accounts.tests.UserServiceTestCase.test_create_user_duplicate_username) ... ok
+test_get_available_agents_ordered_by_workload 
+(accounts.tests.UserServiceTestCase.test_get_available_agents_ordered_by_workload) ... ok
+test_get_user_profile_agent (accounts.tests.UserServiceTestCase.test_get_user_profile_agent) ... ok
+test_get_user_profile_customer (accounts.tests.UserServiceTestCase.test_get_user_profile_customer) ... ok
+test_update_user_role_as_admin (accounts.tests.UserServiceTestCase.test_update_user_role_as_admin) ... ok
+test_update_user_role_non_admin_fails (accounts.tests.UserServiceTestCase.test_update_user_role_non_admin_fails) ... ok
+test_admin_can_message_on_closed_ticket (tickets.tests.MessageServiceTestCase.test_admin_can_message_on_closed_ticket) 
+... ok
+test_cannot_message_on_closed_ticket (tickets.tests.MessageServiceTestCase.test_cannot_message_on_closed_ticket) ... ok
+test_create_message_as_customer (tickets.tests.MessageServiceTestCase.test_create_message_as_customer)
+Test that customers can add messages to their tickets. ... ok
+test_create_message_wrong_ticket_fails (tickets.tests.MessageServiceTestCase.test_create_message_wrong_ticket_fails)
+Test that customers cannot add messages to other tickets. ... ok
+test_get_messages_filtered_by_ticket (tickets.tests.MessageServiceTestCase.test_get_messages_filtered_by_ticket) ... ok
+test_get_messages_for_admin (tickets.tests.MessageServiceTestCase.test_get_messages_for_admin) ... ok
+test_assign_ticket_as_admin (tickets.tests.TicketAPITestCase.test_assign_ticket_as_admin) ... ok
+test_assign_ticket_as_customer_forbidden (tickets.tests.TicketAPITestCase.test_assign_ticket_as_customer_forbidden) 
+... WARNING 2026-07-18 11:25:22,157 log Forbidden: /api/tickets/1/assign/
+ok
+test_change_priority_as_agent (tickets.tests.TicketAPITestCase.test_change_priority_as_agent) ... ok
+test_change_status_as_agent (tickets.tests.TicketAPITestCase.test_change_status_as_agent)
+Test that agents can change ticket status. ... ok
+test_create_ticket_authenticated (tickets.tests.TicketAPITestCase.test_create_ticket_authenticated)
+Test creating a ticket as authenticated customer. ... ok
+test_create_ticket_unauthenticated (tickets.tests.TicketAPITestCase.test_create_ticket_unauthenticated)
+Test that unauthenticated users cannot create tickets. ... WARNING 2026-07-18 11:25:27,341 log Unauthorized: 
+/api/tickets/
+ok
+test_create_ticket_validation_short_title (tickets.tests.TicketAPITestCase.test_create_ticket_validation_short_title) 
+... WARNING 2026-07-18 11:25:28,595 log Bad Request: /api/tickets/
+ok
+test_delete_ticket_as_admin (tickets.tests.TicketAPITestCase.test_delete_ticket_as_admin) ... ok
+test_filter_tickets_by_status (tickets.tests.TicketAPITestCase.test_filter_tickets_by_status) ... ok
+test_get_statistics (tickets.tests.TicketAPITestCase.test_get_statistics)
+Test ticket statistics endpoint. ... ok
+test_list_tickets_as_customer (tickets.tests.TicketAPITestCase.test_list_tickets_as_customer)
+Test that customers only see their own tickets. ... ok
+test_retrieve_ticket_as_owner (tickets.tests.TicketAPITestCase.test_retrieve_ticket_as_owner) ... ok
+test_create_category_as_admin (tickets.tests.TicketCategoryAPITestCase.test_create_category_as_admin) ... ok
+test_create_category_as_customer_forbidden 
+(tickets.tests.TicketCategoryAPITestCase.test_create_category_as_customer_forbidden) ... WARNING 2026-07-18 
+11:25:37,052 log Forbidden: /api/categories/
+ok
+test_list_categories_authenticated (tickets.tests.TicketCategoryAPITestCase.test_list_categories_authenticated) ... ok
+test_create_message_as_customer (tickets.tests.TicketMessageAPITestCase.test_create_message_as_customer) ... ok
+test_create_message_on_other_ticket_forbidden 
+(tickets.tests.TicketMessageAPITestCase.test_create_message_on_other_ticket_forbidden) ... WARNING 2026-07-18 
+11:25:39,957 log Forbidden: /api/messages/
+ok
+test_list_messages_as_customer (tickets.tests.TicketMessageAPITestCase.test_list_messages_as_customer) ... ok
+test_admin_can_reopen_closed_ticket (tickets.tests.TicketServiceTestCase.test_admin_can_reopen_closed_ticket) ... ok
+test_agent_cannot_reopen_closed_ticket (tickets.tests.TicketServiceTestCase.test_agent_cannot_reopen_closed_ticket) 
+... ok
+test_assign_agent_as_admin (tickets.tests.TicketServiceTestCase.test_assign_agent_as_admin)
+Test that admins can assign agents to tickets. ... ok
+test_assign_agent_as_customer_fails (tickets.tests.TicketServiceTestCase.test_assign_agent_as_customer_fails) ... ok
+test_change_ticket_priority_as_agent (tickets.tests.TicketServiceTestCase.test_change_ticket_priority_as_agent) ... ok
+test_change_ticket_priority_as_customer_fails 
+(tickets.tests.TicketServiceTestCase.test_change_ticket_priority_as_customer_fails) ... ok
+test_change_ticket_status_as_agent (tickets.tests.TicketServiceTestCase.test_change_ticket_status_as_agent)
+Test that agents can change ticket status. ... ok
+test_change_ticket_status_as_customer_fails 
+(tickets.tests.TicketServiceTestCase.test_change_ticket_status_as_customer_fails)
+Test that customers cannot change ticket status. ... ok
+test_create_ticket (tickets.tests.TicketServiceTestCase.test_create_ticket)
+Test ticket creation through service. ... ok
+test_get_tickets_for_admin_sees_all (tickets.tests.TicketServiceTestCase.test_get_tickets_for_admin_sees_all) ... ok
+test_get_tickets_for_agent (tickets.tests.TicketServiceTestCase.test_get_tickets_for_agent) ... ok
+test_get_tickets_for_customer (tickets.tests.TicketServiceTestCase.test_get_tickets_for_customer)
+Test that customers only see their own tickets. ... ok
+test_invalid_status_transition_open_to_resolved_fails 
+(tickets.tests.TicketServiceTestCase.test_invalid_status_transition_open_to_resolved_fails) ... ok
+test_invalid_status_transition_resolved_to_open_fails 
+(tickets.tests.TicketServiceTestCase.test_invalid_status_transition_resolved_to_open_fails) ... ok
+test_valid_status_transition_in_progress_to_resolved 
+(tickets.tests.TicketServiceTestCase.test_valid_status_transition_in_progress_to_resolved) ... ok
+test_valid_status_transition_open_to_in_progress 
+(tickets.tests.TicketServiceTestCase.test_valid_status_transition_open_to_in_progress) ... ok
+test_agents_workload_as_admin (dashboard.tests.DashboardAPITestCase.test_agents_workload_as_admin) ... ok
+test_agents_workload_as_agent_forbidden (dashboard.tests.DashboardAPITestCase.test_agents_workload_as_agent_forbidden) 
+... WARNING 2026-07-18 11:26:04,175 log Forbidden: /api/dashboard/agents/
+ok
+test_agents_workload_as_customer_forbidden 
+(dashboard.tests.DashboardAPITestCase.test_agents_workload_as_customer_forbidden) ... WARNING 2026-07-18 11:26:05,499 
+log Forbidden: /api/dashboard/agents/
+ok
+test_agents_workload_unauthenticated (dashboard.tests.DashboardAPITestCase.test_agents_workload_unauthenticated) ... 
+WARNING 2026-07-18 11:26:06,790 log Unauthorized: /api/dashboard/agents/
+ok
+test_overview_as_admin (dashboard.tests.DashboardAPITestCase.test_overview_as_admin) ... ok
+test_overview_as_agent (dashboard.tests.DashboardAPITestCase.test_overview_as_agent) ... ok
+test_overview_as_customer (dashboard.tests.DashboardAPITestCase.test_overview_as_customer) ... ok
+test_overview_unauthenticated (dashboard.tests.DashboardAPITestCase.test_overview_unauthenticated) ... WARNING 
+2026-07-18 11:26:12,032 log Unauthorized: /api/dashboard/
+ok
+test_admin_overview_includes_global_metrics 
+(dashboard.tests.DashboardServiceTestCase.test_admin_overview_includes_global_metrics) ... ok
+test_agent_overview_includes_agent_metrics 
+(dashboard.tests.DashboardServiceTestCase.test_agent_overview_includes_agent_metrics) ... ok
+test_customer_overview_includes_customer_metrics 
+(dashboard.tests.DashboardServiceTestCase.test_customer_overview_includes_customer_metrics) ... ok
+test_get_agent_workload_counts (dashboard.tests.DashboardServiceTestCase.test_get_agent_workload_counts) ... ok
+test_recent_messages_in_overview (dashboard.tests.DashboardServiceTestCase.test_recent_messages_in_overview) ... ok
+test_recent_tickets_limited_to_five (dashboard.tests.DashboardServiceTestCase.test_recent_tickets_limited_to_five) ... 
+ok
+----------------------------------------------------------------------
+Ran 77 tests in 98.101s
+OK
+Destroying test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
+  Applying tickets.0004_alter_ticketcategory_options... OK
+System check identified no issues (0 silenced).
+
+---
+exit_code: 0
+elapsed_ms: 114643
+ended_at: 2026-07-18T07:56:29.563Z
+---

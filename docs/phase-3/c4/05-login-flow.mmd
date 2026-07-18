@@ -1,0 +1,22 @@
+sequenceDiagram
+    participant User
+    participant Login as Login.tsx
+    participant Auth as AuthContext
+    participant Axios as axiosClient
+    participant CSRF as csrf_token
+    participant Sess as session_check
+    participant LoginAPI as session_login
+    User->>Login: Open /login
+    Auth->>Axios: GET /api/accounts/csrf/
+    Axios->>CSRF: request
+    CSRF-->>Axios: csrftoken cookie
+    Auth->>Axios: GET /api/accounts/session/
+    Axios->>Sess: request
+    Sess-->>Auth: 401 unauthenticated
+    User->>Login: username + password
+    Login->>Auth: login()
+    Auth->>Axios: POST /session/login/ + CSRF
+    Axios->>LoginAPI: credentials
+    LoginAPI-->>Auth: user + sessionid
+    Auth-->>Login: authenticated
+    Login->>User: Navigate /dashboard

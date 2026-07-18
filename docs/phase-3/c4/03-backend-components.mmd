@@ -1,0 +1,30 @@
+flowchart TD
+    subgraph Backend["Django REST API"]
+        subgraph Accounts["accounts"]
+            AV["views + session_views"]
+            US["UserService"]
+            AP["permissions"]
+        end
+        subgraph Tickets["tickets"]
+            TV["Ticket/Category/Message ViewSets"]
+            TS["TicketService"]
+            MS["MessageService"]
+            TP["ticket permissions"]
+        end
+        subgraph Dashboard["dashboard"]
+            DV["Dashboard views"]
+            DS["DashboardService"]
+        end
+        Core["ticketProject urls/settings/exceptions"]
+    end
+    Core --> AV
+    Core --> TV
+    Core --> DV
+    AV --> US
+    AV --> AP
+    TV --> TS
+    TV --> MS
+    TV --> TP
+    DV --> DS
+    DS --> TS
+    DS --> MS

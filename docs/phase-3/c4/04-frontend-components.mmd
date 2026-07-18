@@ -1,0 +1,9 @@
+flowchart TD
+    Main["main.tsx"] --> App["App.tsx"]
+    App --> AuthCtx["AuthContext"]
+    App --> Pages["Pages\nLogin Register Dashboard\nTickets TicketDetails CreateTicket\nProfile AdminUsers AdminCategories\nAdminAgentWorkload"]
+    Pages --> Hooks["hooks\nuseAuth useTickets useDashboard"]
+    Pages --> Components["components\nAppLayout Sidebar Badge\nButton Card Input Select Textarea"]
+    Hooks --> API["api\nauthApi ticketApi dashboardApi"]
+    API --> Axios["axiosClient\nCSRF + credentials"]
+    Components --> AuthCtx

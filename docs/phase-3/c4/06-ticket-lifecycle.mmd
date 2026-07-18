@@ -1,0 +1,24 @@
+sequenceDiagram
+    participant Customer
+    participant UI as Frontend
+    participant API as TicketViewSet
+    participant TSvc as TicketService
+    participant MSvc as MessageService
+    participant Admin
+    participant Agent
+    Customer->>UI: Create ticket
+    UI->>API: POST /api/tickets/
+    API->>TSvc: create_ticket()
+    TSvc-->>UI: OPEN ticket
+    Admin->>UI: Assign agent
+    UI->>API: PATCH /tickets/{id}/assign/
+    API->>TSvc: assign_agent_to_ticket()
+    Agent->>UI: Change status OPEN to IN_PROGRESS
+    UI->>API: PATCH /change_status/
+    API->>TSvc: change_ticket_status()
+    Agent->>UI: Reply message
+    UI->>API: POST /api/messages/
+    API->>MSvc: create_message()
+    Agent->>UI: Change status to RESOLVED then CLOSED
+    UI->>API: PATCH /change_status/
+    Note over TSvc: CLOSED reopen only by admin

@@ -1,0 +1,12 @@
+flowchart TD
+    subgraph Users["Users"]
+        Customer["Customer\n[Person]\nReports and tracks\nsupport tickets"]
+        Agent["Agent\n[Person]\nHandles assigned tickets\nand resolves issues"]
+        Admin["Admin\n[Person]\nManages users, agents,\ncategories, and system"]
+    end
+    subgraph System["System"]
+        TMS["Ticket Management System\n[Software System]\nFull-stack web application\nfor ticket management\nwith role-based access"]
+    end
+    Customer -->|"Creates and views tickets\nsends messages"| TMS
+    Agent -->|"Manages assigned tickets\nchanges status/priority\nreplies to customers"| TMS
+    Admin -->|"Manages users, roles,\ncategories, agent workload\nsystem-wide metrics"| TMS
