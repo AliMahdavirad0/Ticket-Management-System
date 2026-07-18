@@ -24,6 +24,11 @@ SRS functional requirements on pages 11–12 do not use formal IDs. IDs below (`
 | **Backend tests** | `tickets.tests.TicketServiceTestCase.test_create_ticket`, `tickets.tests.TicketAPITestCase.test_create_ticket_authenticated`, `test_create_ticket_unauthenticated`, `test_create_ticket_validation_short_title` |
 | **Screenshots** | `screenshots/before-after-ticket-creation-before.png`, `screenshots/before-after-ticket-creation-after.png`, `screenshots/03-ticket-list.png` |
 
+![Ticket creation before](screenshots/before-after-ticket-creation-before.png) *قبل از ایجاد*
+![Ticket creation after](screenshots/before-after-ticket-creation-after.png) *پس از ایجاد*
+
+![Ticket list](screenshots/03-ticket-list.png) *لیست تیکت‌ها*
+
 ### FR-02 — پردازش خودکار درخواست و ارجاع (Automatic processing & assignment)
 | Field | Value |
 |-------|-------|
@@ -34,6 +39,8 @@ SRS functional requirements on pages 11–12 do not use formal IDs. IDs below (`
 | **Source code** | No auto-routing service. Manual assign only: `backend/tickets/services/ticket_service.py` (`assign_agent_to_ticket` — admin only), `frontend/src/pages/TicketDetails.tsx` (Assign Agent UI) |
 | **Backend tests** | Related (manual assign): `test_assign_agent_as_admin`, `test_assign_ticket_as_admin`, `test_assign_ticket_as_customer_forbidden` — these prove **manual** assign, not automatic |
 | **Screenshots** | `screenshots/08-ticket-assignment.png` (manual assignment UI) |
+
+![Ticket assignment](screenshots/08-ticket-assignment.png) *تخصیص دستی کارشناس*
 
 ### FR-03 — مدیریت وضعیت درخواست (Ticket status management)
 | Field | Value |
@@ -46,6 +53,11 @@ SRS functional requirements on pages 11–12 do not use formal IDs. IDs below (`
 | **Backend tests** | `test_change_ticket_status_as_agent`, `test_change_ticket_status_as_customer_fails`, `test_valid_status_transition_*`, `test_invalid_status_transition_*`, `test_admin_can_reopen_closed_ticket`, `test_agent_cannot_reopen_closed_ticket`, `test_change_status_as_agent` |
 | **Screenshots** | `screenshots/04-ticket-details.png`, `screenshots/before-after-status-update-before.png`, `screenshots/before-after-status-update-after.png` |
 
+![Ticket details](screenshots/04-ticket-details.png) *جزئیات تیکت*
+
+![Status before](screenshots/before-after-status-update-before.png) *وضعیت: قبل*
+![Status after](screenshots/before-after-status-update-after.png) *وضعیت: بعد*
+
 ### FR-04 — تعامل کاربر با کارشناس (User–agent conversation)
 | Field | Value |
 |-------|-------|
@@ -56,6 +68,8 @@ SRS functional requirements on pages 11–12 do not use formal IDs. IDs below (`
 | **Source code** | `backend/tickets/views.py` (`TicketMessageViewSet`), `backend/tickets/services/message_service.py`, `frontend/src/pages/TicketDetails.tsx` (Messages section) |
 | **Backend tests** | `MessageServiceTestCase.*`, `TicketMessageAPITestCase.*`, `test_cannot_message_on_closed_ticket` |
 | **Screenshots** | `screenshots/05-ticket-conversation.png`, `screenshots/04-ticket-details.png` |
+
+![Ticket conversation](screenshots/05-ticket-conversation.png) *گفتگوی تیکت*
 
 ### FR-05 — داشبورد مدیریتی (Admin management dashboard)
 | Field | Value |
@@ -68,6 +82,12 @@ SRS functional requirements on pages 11–12 do not use formal IDs. IDs below (`
 | **Backend tests** | `DashboardServiceTestCase.*`, `DashboardAPITestCase.*` |
 | **Screenshots** | `screenshots/06-admin-dashboard.png`, `screenshots/07-agent-dashboard.png`, `screenshots/02-customer-dashboard.png` |
 
+![Admin dashboard](screenshots/06-admin-dashboard.png) *داشبورد مدیر*
+
+![Agent dashboard](screenshots/07-agent-dashboard.png) *داشبورد کارشناس*
+
+![Customer dashboard](screenshots/02-customer-dashboard.png) *داشبورد مشتری*
+
 ### FR-06 — پیگیری درخواست توسط کاربر (Customer ticket tracking)
 | Field | Value |
 |-------|-------|
@@ -79,6 +99,8 @@ SRS functional requirements on pages 11–12 do not use formal IDs. IDs below (`
 | **Backend tests** | `test_get_tickets_for_customer`, `test_list_tickets_as_customer`, `test_retrieve_ticket_as_owner`, `test_customer_overview_includes_customer_metrics` |
 | **Screenshots** | `screenshots/02-customer-dashboard.png`, `screenshots/03-ticket-list.png`, `screenshots/04-ticket-details.png` |
 
+(تصاویر در FR-۰۱، FR-۰۵، FR-۰۶ همان‌ها هستند)
+
 ### FR-07 — طبقه‌بندی و اولویت‌بندی تیکت‌ها (Categorization & priority)
 | Field | Value |
 |-------|-------|
@@ -89,6 +111,8 @@ SRS functional requirements on pages 11–12 do not use formal IDs. IDs below (`
 | **Source code** | `backend/tickets/models.py` (`priority`, `TicketCategory`), category APIs in `TicketCategoryViewSet`, `frontend/src/pages/CreateTicket.tsx`, `AdminCategories.tsx` |
 | **Backend tests** | `TicketCategoryAPITestCase.*`, priority change tests |
 | **Screenshots** | `screenshots/before-after-ticket-creation-before.png`, `screenshots/03-ticket-list.png` |
+
+(تصاویر در FR-۰۱ و FR-۰۶ نمایش داده شده‌اند)
 
 ### FR-08 — پاسخگویی خودکار به سوالات پرتکرار (FAQ auto-reply)
 | Field | Value |
@@ -110,6 +134,8 @@ SRS functional requirements on pages 11–12 do not use formal IDs. IDs below (`
 | **Backend tests** | `test_get_agent_workload_counts`, `test_agents_workload_as_admin` |
 | **Screenshots** | `screenshots/06-admin-dashboard.png` (counts only) |
 
+(تصویر در FR-۰۵ نمایش داده شده است)
+
 ### FR-10 — احراز هویت مبتنی بر نام کاربری و رمز عبور
 | Field | Value |
 |-------|-------|
@@ -119,6 +145,10 @@ SRS functional requirements on pages 11–12 do not use formal IDs. IDs below (`
 | **Source code** | `backend/accounts/session_views.py`, `frontend/src/pages/Login.tsx`, `frontend/src/context/AuthContext.tsx` |
 | **Backend tests** | `test_login_success`, `test_login_invalid_credentials`, register/password tests |
 | **Screenshots** | `screenshots/01-login.png`, `screenshots/before-after-validation-invalid-login.png` |
+
+![Login page](screenshots/01-login.png) *صفحه ورود*
+
+![Validation — invalid login](screenshots/before-after-validation-invalid-login.png) *اعتبارسنجی ورود نامعتبر*
 
 ### FR-11 — کنترل سطح دسترسی نقش‌ها (RBAC)
 | Field | Value |
@@ -130,6 +160,8 @@ SRS functional requirements on pages 11–12 do not use formal IDs. IDs below (`
 | **Backend tests** | Multiple forbidden-path tests across accounts/tickets/dashboard |
 | **Screenshots** | Role-specific dashboards: `02-`, `06-`, `07-` |
 
+(داشبوردهای نقش‌محور در FR-۰۵ نمایش داده شده‌اند)
+
 ### FR-12 — مدیریت کاربران و نقش‌ها (Admin user management)
 | Field | Value |
 |-------|-------|
@@ -139,6 +171,8 @@ SRS functional requirements on pages 11–12 do not use formal IDs. IDs below (`
 | **Source code** | `backend/accounts/views.py` (`UserListView`, `UserRoleUpdateView`), `frontend/src/pages/AdminUsers.tsx` |
 | **Backend tests** | `test_list_users_as_admin`, `test_update_user_role_as_admin`, `test_update_user_role_as_customer_forbidden` |
 | **Screenshots** | Admin nav visible in `screenshots/06-admin-dashboard.png` |
+
+(داشبورد مدیر در FR-۰۵ نمایش داده شده است)
 
 ### FR-13 — فیلتر / جستجوی تیکت‌ها
 | Field | Value |
@@ -150,6 +184,9 @@ SRS functional requirements on pages 11–12 do not use formal IDs. IDs below (`
 | **Backend tests** | `test_filter_tickets_by_status` |
 | **Screenshots** | `screenshots/before-after-filtering-before.png`, `screenshots/before-after-filtering-after.png` |
 
+![Filtering before](screenshots/before-after-filtering-before.png) *فیلتر: قبل*
+![Filtering after](screenshots/before-after-filtering-after.png) *فیلتر: بعد*
+
 ### FR-14 — مستندات تعاملی API (Swagger)
 | Field | Value |
 |-------|-------|
@@ -159,6 +196,8 @@ SRS functional requirements on pages 11–12 do not use formal IDs. IDs below (`
 | **Source code** | `backend/ticketProject/urls.py` + `drf-spectacular` settings |
 | **Backend tests** | N/A (docs endpoint) |
 | **Screenshots** | `screenshots/09-swagger.png` |
+
+![Swagger API docs](screenshots/09-swagger.png) *مستندات Swagger*
 
 ---
 
@@ -184,7 +223,9 @@ SRS functional requirements on pages 11–12 do not use formal IDs. IDs below (`
 | **Notes** | Django password hashing + session/CSRF implemented. Local demo uses HTTP (not HTTPS). SQLite file DB. |
 | **Source code** | `backend/ticketProject/settings.py` (auth, CSRF, CORS, sessions) |
 | **Backend tests** | Auth/permission tests |
-| **Screenshots** | `01-login.png` |
+| **Screenshots** | `screenshots/01-login.png` |
+
+![Login page](screenshots/01-login.png) *صفحه ورود*
 
 ### NFR-03 — اطمینان‌پذیری و پیام خطا
 | Field | Value |
@@ -195,7 +236,7 @@ SRS functional requirements on pages 11–12 do not use formal IDs. IDs below (`
 | **Notes** | API returns structured errors; custom exception handler exists. No backup/recovery automation evidenced. |
 | **Source code** | `backend/ticketProject/exceptions.py`, frontend error banners |
 | **Backend tests** | Validation/auth failure tests |
-| **Screenshots** | `before-after-validation-invalid-login.png` |
+| **Screenshots** | `screenshots/before-after-validation-invalid-login.png` |
 
 ### NFR-04 — قابلیت نگهداری و یکپارچه‌سازی
 | Field | Value |
@@ -205,7 +246,7 @@ SRS functional requirements on pages 11–12 do not use formal IDs. IDs below (`
 | **Status** | **Partial** |
 | **Notes** | Layered View→Service→Model + docs + OpenAPI help maintainability. No external system integrations implemented. |
 | **Source code** | `docs/`, `backend/*/services/`, Swagger |
-| **Screenshots** | `09-swagger.png` |
+| **Screenshots** | `screenshots/09-swagger.png` |
 
 ### NFR-05 — سازگاری مرورگر / چندسکویی
 | Field | Value |

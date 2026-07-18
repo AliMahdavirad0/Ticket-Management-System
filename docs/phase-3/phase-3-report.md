@@ -77,6 +77,14 @@
 
 ![Container](c4/02-container.svg)
 
+![Backend Components](c4/03-backend-components.svg)
+
+![Frontend Components](c4/04-frontend-components.svg)
+
+![Login Flow](c4/05-login-flow.svg)
+
+![Ticket Lifecycle](c4/06-ticket-lifecycle.svg)
+
 ---
 
 ## ۵. نتایج تست بک‌اند
@@ -121,7 +129,19 @@ OK
 
 ![Customer Dashboard](screenshots/02-customer-dashboard.png)
 
+![Ticket List](screenshots/03-ticket-list.png)
+
+![Ticket Details](screenshots/04-ticket-details.png)
+
+![Ticket Conversation](screenshots/05-ticket-conversation.png)
+
 ![Admin Dashboard](screenshots/06-admin-dashboard.png)
+
+![Agent Dashboard](screenshots/07-agent-dashboard.png)
+
+![Ticket Assignment](screenshots/08-ticket-assignment.png)
+
+![Swagger API Docs](screenshots/09-swagger.png)
 
 ---
 
@@ -133,6 +153,19 @@ OK
 | ایجاد تیکت | `before-after-ticket-creation-before.png` | `before-after-ticket-creation-after.png` |
 | به‌روزرسانی وضعیت | `before-after-status-update-before.png` | `before-after-status-update-after.png` |
 | فیلتر لیست | `before-after-filtering-before.png` | `before-after-filtering-after.png` |
+
+![Validation — empty submit](screenshots/before-after-validation-empty-submit.png)
+
+![Validation — invalid login](screenshots/before-after-validation-invalid-login.png)
+
+![Ticket creation — before](screenshots/before-after-ticket-creation-before.png)
+![Ticket creation — after](screenshots/before-after-ticket-creation-after.png)
+
+![Status update — before](screenshots/before-after-status-update-before.png)
+![Status update — after](screenshots/before-after-status-update-after.png)
+
+![Filtering — before](screenshots/before-after-filtering-before.png)
+![Filtering — after](screenshots/before-after-filtering-after.png)
 
 این تصاویر از اجرای واقعی UI روی `http://127.0.0.1:5173` با API محلی گرفته شده‌اند. اطلاعات ورود آزمایشی در این گزارش درج نشده است.
 
