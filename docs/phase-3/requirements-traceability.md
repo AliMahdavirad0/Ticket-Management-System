@@ -22,9 +22,8 @@ SRS functional requirements on pages 11–12 do not use formal IDs. IDs below (`
 | **Description (SRS)** | Users must register support requests as tickets with subject, description, and priority. |
 | **Source code** | `backend/tickets/views.py` (`TicketViewSet.create`), `backend/tickets/services/ticket_service.py` (`create_ticket`), `backend/tickets/serializers.py` (`TicketCreateSerializer`), `frontend/src/pages/CreateTicket.tsx` |
 | **Backend tests** | `tickets.tests.TicketServiceTestCase.test_create_ticket`, `tickets.tests.TicketAPITestCase.test_create_ticket_authenticated`, `test_create_ticket_unauthenticated`, `test_create_ticket_validation_short_title` |
-| **Screenshots** | `screenshots/before-after-ticket-creation-before.png`, `screenshots/before-after-ticket-creation-after.png`, `screenshots/03-ticket-list.png` |
+| **Screenshots** | `screenshots/before-after-ticket-creation-after.png`, `screenshots/03-ticket-list.png` |
 
-![Ticket creation before](screenshots/before-after-ticket-creation-before.png) *قبل از ایجاد*
 ![Ticket creation after](screenshots/before-after-ticket-creation-after.png) *پس از ایجاد*
 
 ![Ticket list](screenshots/03-ticket-list.png) *لیست تیکت‌ها*
@@ -51,12 +50,11 @@ SRS functional requirements on pages 11–12 do not use formal IDs. IDs below (`
 | **Description (SRS)** | Tickets can be Open / In Progress / Resolved. Implementation also adds Closed with enforced transitions. |
 | **Source code** | `backend/tickets/models.py` (`Ticket.Status`), `backend/tickets/services/ticket_service.py` (`change_ticket_status`, `VALID_TRANSITIONS`), `frontend/src/pages/TicketDetails.tsx` |
 | **Backend tests** | `test_change_ticket_status_as_agent`, `test_change_ticket_status_as_customer_fails`, `test_valid_status_transition_*`, `test_invalid_status_transition_*`, `test_admin_can_reopen_closed_ticket`, `test_agent_cannot_reopen_closed_ticket`, `test_change_status_as_agent` |
-| **Screenshots** | `screenshots/04-ticket-details.png`, `screenshots/before-after-status-update-before.png`, `screenshots/before-after-status-update-after.png` |
+| **Screenshots** | `screenshots/04-ticket-details.png`, `screenshots/before-after-status-update-before.png` |
 
 ![Ticket details](screenshots/04-ticket-details.png) *جزئیات تیکت*
 
-![Status before](screenshots/before-after-status-update-before.png) *وضعیت: قبل*
-![Status after](screenshots/before-after-status-update-after.png) *وضعیت: بعد*
+![Status update](screenshots/before-after-status-update-before.png) *به‌روزرسانی وضعیت*
 
 ### FR-04 — تعامل کاربر با کارشناس (User–agent conversation)
 | Field | Value |
@@ -67,9 +65,7 @@ SRS functional requirements on pages 11–12 do not use formal IDs. IDs below (`
 | **Description (SRS)** | Users and agents can post messages inside a ticket. |
 | **Source code** | `backend/tickets/views.py` (`TicketMessageViewSet`), `backend/tickets/services/message_service.py`, `frontend/src/pages/TicketDetails.tsx` (Messages section) |
 | **Backend tests** | `MessageServiceTestCase.*`, `TicketMessageAPITestCase.*`, `test_cannot_message_on_closed_ticket` |
-| **Screenshots** | `screenshots/05-ticket-conversation.png`, `screenshots/04-ticket-details.png` |
-
-![Ticket conversation](screenshots/05-ticket-conversation.png) *گفتگوی تیکت*
+| **Screenshots** | `screenshots/04-ticket-details.png` |
 
 ### FR-05 — داشبورد مدیریتی (Admin management dashboard)
 | Field | Value |
@@ -110,7 +106,7 @@ SRS functional requirements on pages 11–12 do not use formal IDs. IDs below (`
 | **Description** | SRS expects classification by subject/priority/content. Implementation supports manual priority + optional category; **no automatic content-based classification**. |
 | **Source code** | `backend/tickets/models.py` (`priority`, `TicketCategory`), category APIs in `TicketCategoryViewSet`, `frontend/src/pages/CreateTicket.tsx`, `AdminCategories.tsx` |
 | **Backend tests** | `TicketCategoryAPITestCase.*`, priority change tests |
-| **Screenshots** | `screenshots/before-after-ticket-creation-before.png`, `screenshots/03-ticket-list.png` |
+| **Screenshots** | `screenshots/before-after-ticket-creation-after.png`, `screenshots/03-ticket-list.png` |
 
 (تصاویر در FR-۰۱ و FR-۰۶ نمایش داده شده‌اند)
 
@@ -182,10 +178,9 @@ SRS functional requirements on pages 11–12 do not use formal IDs. IDs below (`
 | **Status** | **Implemented** (backend full; frontend status/priority/search) |
 | **Source code** | `backend/tickets/views.py` (`filterset_fields`, `search_fields`), `frontend/src/pages/Tickets.tsx` |
 | **Backend tests** | `test_filter_tickets_by_status` |
-| **Screenshots** | `screenshots/before-after-filtering-before.png`, `screenshots/before-after-filtering-after.png` |
+| **Screenshots** | `screenshots/before-after-filtering-after.png` |
 
-![Filtering before](screenshots/before-after-filtering-before.png) *فیلتر: قبل*
-![Filtering after](screenshots/before-after-filtering-after.png) *فیلتر: بعد*
+![Filtering](screenshots/before-after-filtering-after.png) *فیلتر لیست*
 
 ### FR-14 — مستندات تعاملی API (Swagger)
 | Field | Value |

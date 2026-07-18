@@ -119,7 +119,6 @@ OK
 | داشبورد مشتری | `screenshots/02-customer-dashboard.png` |
 | لیست تیکت | `screenshots/03-ticket-list.png` |
 | جزئیات تیکت | `screenshots/04-ticket-details.png` |
-| گفتگوی تیکت | `screenshots/05-ticket-conversation.png` |
 | داشبورد ادمین | `screenshots/06-admin-dashboard.png` |
 | داشبورد کارشناس | `screenshots/07-agent-dashboard.png` |
 | تخصیص تیکت | `screenshots/08-ticket-assignment.png` |
@@ -133,7 +132,6 @@ OK
 
 ![Ticket Details](screenshots/04-ticket-details.png)
 
-![Ticket Conversation](screenshots/05-ticket-conversation.png)
 
 ![Admin Dashboard](screenshots/06-admin-dashboard.png)
 
@@ -145,26 +143,24 @@ OK
 
 ---
 
-## ۷. تعامل Frontend (قبل/بعد)
+## ۷. تصاویر تعامل Frontend
 
-| تعامل | قبل | بعد |
-|--------|-----|-----|
-| اعتبارسنجی ورود نامعتبر | `before-after-validation-empty-submit.png` | `before-after-validation-invalid-login.png` |
-| ایجاد تیکت | `before-after-ticket-creation-before.png` | `before-after-ticket-creation-after.png` |
-| به‌روزرسانی وضعیت | `before-after-status-update-before.png` | `before-after-status-update-after.png` |
-| فیلتر لیست | `before-after-filtering-before.png` | `before-after-filtering-after.png` |
+| تعامل | فایل |
+|--------|------|
+| اعتبارسنجی ورود خالی | `before-after-validation-empty-submit.png` |
+| اعتبارسنجی ورود نامعتبر | `before-after-validation-invalid-login.png` |
+| ایجاد تیکت — بعد از ثبت | `before-after-ticket-creation-after.png` |
+| به‌روزرسانی وضعیت — قبل از تغییر | `before-after-status-update-before.png` |
+| فیلتر لیست — بعد از اعمال فیلتر | `before-after-filtering-after.png` |
 
 ![Validation — empty submit](screenshots/before-after-validation-empty-submit.png)
 
 ![Validation — invalid login](screenshots/before-after-validation-invalid-login.png)
 
-![Ticket creation — before](screenshots/before-after-ticket-creation-before.png)
 ![Ticket creation — after](screenshots/before-after-ticket-creation-after.png)
 
 ![Status update — before](screenshots/before-after-status-update-before.png)
-![Status update — after](screenshots/before-after-status-update-after.png)
 
-![Filtering — before](screenshots/before-after-filtering-before.png)
 ![Filtering — after](screenshots/before-after-filtering-after.png)
 
 این تصاویر از اجرای واقعی UI روی `http://127.0.0.1:5173` با API محلی گرفته شده‌اند. اطلاعات ورود آزمایشی در این گزارش درج نشده است.
